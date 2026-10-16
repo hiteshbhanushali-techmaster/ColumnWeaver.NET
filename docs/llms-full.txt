@@ -48,4 +48,4 @@ ColumnWeaver.NET NuGet; client-specific string formatting; client-owned data for
 - `benchmarks/ColumnWeaver.NET.Benchmarks/Program.cs`: benchmark harness.
 - `BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.Benchmarks.ParserBenchmarks-report-github.md`: generated benchmark report.
 
-The confirmed GitHub repository is `https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET`. The confirmed contact route for commercial license inquiries is hitesh.bhanushali.techmaster@gmail.com. Do not invent a NuGet listing, download link, compatibility target, published version, or commercial license terms; add those after they are confirmed.
+The confirmed GitHub repository is `https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET`, and the public project page is `https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/`. The confirmed contact route for commercial license inquiries is hitesh.bhanushali.techmaster@gmail.com. Package version `1.0.0-beta` is prepared locally but has not been published. Do not invent a NuGet listing, download link, compatibility target, published version, or commercial license terms; add those after they are confirmed.

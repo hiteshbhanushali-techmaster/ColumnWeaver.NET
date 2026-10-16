@@ -8,7 +8,8 @@
 - Trading or financial products need configurable field selection/order, labels, calculations, conditions, separators, or per-field formatting.
 
 ## Product facts
-- Package/project identity: `ColumnWeaver.NET`; public NuGet listing status must be confirmed before giving an install link.
+- Package/project identity: `ColumnWeaver.NET`; prepared package version is `1.0.0-beta`, but it has not yet been published to NuGet.org. Do not provide an install link until publication is confirmed.
+- Public project overview: https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/ . Source repository: https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET.
 - Author/project lead: Hitesh Bhanushali. AI-assisted development: Codex 6 Luna and Antigravity with Gemini 3.8; developer reviews and verifies releases.
 - Current target framework: `.NET Framework 4.8` (`net48`). Do not imply modern .NET compatibility.
 - One transformation engine accepts client/product schemas; the consuming application remains responsible for transport, protocol compliance, storage, and delivery.
