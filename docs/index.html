@@ -10,7 +10,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="ColumnWeaver.NET — configurable object-to-string pipelines">
   <meta property="og:description" content="Client-specific output formats from reusable configuration, without another hard-coded formatter in every project.">
-  <meta property="og:image" content="assets/columnweaver-mark.png">
+  <meta property="og:image" content="https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/docs/assets/columnweaver-mark.png">
   <title>ColumnWeaver.NET — configurable object-to-string pipelines</title>
   <link rel="icon" type="image/png" sizes="128x128" href="assets/columnweaver-icon.png">
   <link rel="apple-touch-icon" href="assets/columnweaver-icon.png">
@@ -79,7 +79,7 @@
       <div id="top" class="eyebrow">One transformation engine · client-owned output formats</div>
       <h1>Give every client the format they need—without rewriting your application.</h1>
       <p class="lead">ColumnWeaver.NET lets a .NET Framework 4.8 application apply reusable formatting schemas to its data. Define columns, calculations, conditions, labels, separators, and value rules per client or product, then run them through the same compiled engine.</p>
-      <div class="actions"><a class="button primary" href="../README.md">Explore the project</a><a class="button" href="#benchmarks">See measured performance</a></div>
+      <div class="actions"><a class="button primary" href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET">Explore the project</a><a class="button" href="#benchmarks">See measured performance</a></div>
       <p class="muted">For client-specific exports and integrations, including trading and financial software · Current target: .NET Framework 4.8 · NuGet version: pending release decision</p>
     </div>
   </header>
@@ -128,7 +128,7 @@
         </tbody>
       </table></div>
       <p class="note" style="margin-top:18px">Hard-coded C# remains faster in several individual scenarios. The benchmark demonstrates the cost of configurable execution for these measured schemas; it does not establish performance for every application, data shape, or tail-latency requirement. See the full BenchmarkDotNet report and harness in the repository.</p>
-      <p>Reproduce with: <code>dotnet run --project benchmarks/ColumnWeaver.NET.Benchmarks/ColumnWeaver.NET.Benchmarks.csproj -c Release -- --bdn</code>. See the <a href="../BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.Benchmarks.ParserBenchmarks-report-github.md">full BenchmarkDotNet report</a> and <a href="../benchmarks/ColumnWeaver.NET.Benchmarks/Program.cs">benchmark harness</a>.</p>
+      <p>Reproduce with: <code>dotnet run --project benchmarks/ColumnWeaver.NET.Benchmarks/ColumnWeaver.NET.Benchmarks.csproj -c Release -- --bdn</code>. See the <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.Benchmarks.ParserBenchmarks-report-github.md">full BenchmarkDotNet report</a> and <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/benchmarks/ColumnWeaver.NET.Benchmarks/Program.cs">benchmark harness</a>.</p>
     </section>
     <section id="quickstart">
       <div class="eyebrow">Quick start</div><h2>Define columns, then reuse the client</h2>
@@ -156,7 +156,7 @@ string row = parser.Parse(order);</code></pre>
     <section id="terms">
       <div class="eyebrow">Distribution terms</div><h2>AGPL community license, with a commercial option</h2>
       <p>The community edition is licensed under GNU AGPL-3.0-or-later. Organizations that need proprietary embedding may request a separate commercial license from the rights holder by emailing <a href="mailto:hitesh.bhanushali.techmaster@gmail.com">Hitesh Bhanushali</a>. Commercial scope, fees, and support terms are not published yet; until an agreement is signed, the AGPL applies.</p>
-      <p class="note">AGPL is a copyleft license: distributing an application that incorporates the library can bring source-sharing obligations, depending on how the work is combined, and modified network services have additional source-offer duties. The library license does not charge separately for ordinary output strings or records. See <a href="../COMMERCIAL-LICENSING.md">commercial licensing notes</a> and the <a href="https://www.gnu.org/licenses/agpl-3.0.txt">full AGPL text</a>.</p>
+      <p class="note">AGPL is a copyleft license: distributing an application that incorporates the library can bring source-sharing obligations, depending on how the work is combined, and modified network services have additional source-offer duties. The library license does not charge separately for ordinary output strings or records. See <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/COMMERCIAL-LICENSING.md">commercial licensing notes</a>, the <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/LICENSE">project license</a>, and the <a href="https://www.gnu.org/licenses/agpl-3.0.txt">full AGPL text</a>.</p>
     </section>
     <section id="credits">
       <div class="eyebrow">Project credits</div><h2>Concept, direction, and verification</h2>
