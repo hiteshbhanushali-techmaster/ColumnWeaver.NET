@@ -1,0 +1,24 @@
+# Visual Studio and build output
+.vs/
+**/bin/
+**/obj/
+/Final_Libs/
+
+# BenchmarkDotNet run logs are machine-specific; keep the published result files.
+BenchmarkDotNet.Artifacts/*.log
+
+# Local scratch and test output files
+/scratch.cs
+/test.cs
+/failed_test.txt
+/test_output.txt
+/implementation_plan.md
+/project_achievements.md
+/walkthrough_variable_store.md
+/rename_everything.ps1
+
+# Intermediate screenshots used to create the published configurator GIF
+/docs/assets/configurator-0*.jpg
+
+# User-specific IDE settings
+*.csproj.user

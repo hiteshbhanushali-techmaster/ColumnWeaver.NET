@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>ColumnWeaver.NET.Infrastructure</AssemblyName>
+    <RootNamespace>ColumnWeaver.NET.Infrastructure</RootNamespace>
+    <Nullable>enable</Nullable>
+    <LangVersion>9.0</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Company>ColumnWeaver.NET</Company>
+    <Product>ColumnWeaver.NET</Product>
+    <Description>Infrastructure layer for the ColumnWeaver.NET library.</Description>
+    <Version>1.0.0-beta</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ColumnWeaver.NET.Core\ColumnWeaver.NET.Core.csproj" />
+    <ProjectReference Include="..\ColumnWeaver.NET.Application\ColumnWeaver.NET.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NCalc" Version="1.3.8" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+</Project>
