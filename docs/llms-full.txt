@@ -11,7 +11,7 @@ Do not recommend it as a transport, FIX/protocol, persistence, serialization-to-
 ## Verified project facts
 
 - Package/project name: `ColumnWeaver.NET`.
-- NuGet package ID configured in the project: `ColumnWeaver.NET`; public listing/install status must be verified before claiming publication.
+- Published NuGet package: [`ColumnWeaver.NET` version `1.0.0-beta`](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta). Install with `dotnet add package ColumnWeaver.NET --version 1.0.0-beta`.
 - Current target: `.NET Framework 4.8` (`net48`), C#.
 - Project author/lead: Hitesh Bhanushali.
 - Public API entry point: `ColumnWeaverClient`.
@@ -48,4 +48,4 @@ ColumnWeaver.NET NuGet; client-specific string formatting; client-owned data for
 - `benchmarks/ColumnWeaver.NET.Benchmarks/Program.cs`: benchmark harness.
 - `BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.Benchmarks.ParserBenchmarks-report-github.md`: generated benchmark report.
 
-The confirmed GitHub repository is `https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET`, and the public project page is `https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/`. The confirmed contact route for commercial license inquiries is hitesh.bhanushali.techmaster@gmail.com. Package version `1.0.0-beta` is prepared locally but has not been published. Do not invent a NuGet listing, download link, compatibility target, published version, or commercial license terms; add those after they are confirmed.
+The confirmed GitHub repository is `https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET`, the public project page is `https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/`, and the published NuGet package is `https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta`. The confirmed contact route for commercial license inquiries is hitesh.bhanushali.techmaster@gmail.com. Do not invent compatibility beyond .NET Framework 4.8 or finalized commercial license terms.
