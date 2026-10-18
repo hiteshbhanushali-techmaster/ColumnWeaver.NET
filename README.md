@@ -2,7 +2,7 @@
 
 **Client-specific data formatting without rewriting your application's transformation code.**
 
-[![Target](https://img.shields.io/badge/target-.NET%20Framework%204.8-blue.svg)](#requirements)
+[![Target](https://img.shields.io/badge/target-.NET%20Framework%204.8%20%7C%20.NET%20Standard%202.0-blue.svg)](#requirements-building)
 [![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](#license)
 [![NuGet](https://img.shields.io/nuget/v/ColumnWeaver.NET.svg)](https://www.nuget.org/packages/ColumnWeaver.NET/)
 
@@ -12,7 +12,7 @@
 
 ![ColumnWeaver.NET configurator demo: formula, variables, and live JSON parse preview](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/docs/assets/configurator-demo.gif)
 
-ColumnWeaver.NET exists to let each client or product define its own output format without forcing the host application to grow another hard-coded formatter. Integrate the library into a .NET Framework 4.8 project, define a reusable formatting configuration, and apply that configuration to source objects through the same transformation engine.
+ColumnWeaver.NET exists to let each client or product define its own output format without forcing the host application to grow another hard-coded formatter. Integrate the library into a .NET Framework 4.8 or modern .NET (.NET 6/8/9+) project, define a reusable formatting configuration, and apply that configuration to source objects through the same transformation engine.
 
 This is especially useful in trading and financial software, where multiple products, integrations, or clients may require different field selection, ordering, labels, calculations, conditions, separators, and value formatting. Instead of copying and rewriting transformation code for every project or customer, the application can reuse ColumnWeaver.NET and supply a different schema for each output contract.
 
@@ -40,7 +40,7 @@ The WinForms configurator is an authoring tool rather than a runtime dependency.
 
 ### Current Implementation (V2.5)
 
-- **Target Framework:** `.NET Framework 4.8` (`net48`).
+- **Target Frameworks:** Multi-targets `.NET Framework 4.8` (`net48`) and `.NET Standard 2.0` (`netstandard2.0`, compatible with .NET 6/8/9+). The WinForms visual configurator runs on Windows/.NET Framework 4.8.
 - **Compiled Execution:** `CompiledParserEngine` pre-compiles column pipelines into reusable execution plans. Simple property paths and expressions compile to LINQ expression tree delegates via `LambdaExpressionEngine`.
 - **NCalc Fallback:** Complex mathematical, boolean, and custom expressions leverage NCalc 1.3.8 as a reliable runtime fallback without sacrificing configuration flexibility.
 - **Cross-Column & Variable Binding:** Formulas and conditions can reference previous columns (`${ColumnName}`) and external variables (`${VariableName}`). Variables are passed as typed parameters into expressions, preserving strings with quotes and special characters, numbers, booleans, and nulls without string corruption.
@@ -51,13 +51,13 @@ The WinForms configurator is an authoring tool rather than a runtime dependency.
 
 ## Quick Start
 
-Install the published package into a compatible project:
+Install the package into a compatible project:
 
 ```powershell
 dotnet add package ColumnWeaver.NET --version 1.0.0-beta
 ```
 
-The package targets .NET Framework 4.8. Review the [NuGet package page](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta) and [license](LICENSE) before integrating it.
+The library supports .NET Framework 4.8 and .NET Standard 2.0 (.NET 6/8/9+). Review the [NuGet package page](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta) and [license](LICENSE) before integrating it.
 
 ```csharp
 using ColumnWeaver.NET;
@@ -275,8 +275,8 @@ All implementations use identical input objects and are asserted in setup to pro
 | Deterministic execution plan caching | **Completed** | Automatic cache invalidation on configuration mutation |
 | WinForms configurator parity | **Completed** | Live preview aligned with `ColumnWeaverClient` |
 | Reproducible benchmark suite | **Completed** | `ColumnWeaver.NET.Benchmarks` (BenchmarkDotNet & MemoryDiagnoser) |
-| Fluent configuration builder (`ParserConfigurationBuilder`) | **Planned (V3)** | Fluent API for constructing configurations |
-| Cross-platform .NET 8 / modern .NET port | **Planned (V3)** | Target modern .NET LTS alongside net48 |
+| Fluent configuration builder (`ParserConfigurationBuilder`) | **Completed** | Fluent API for constructing configurations |
+| .NET Standard 2.0 & modern .NET multi-targeting | **Completed** | Dual-targets `net48` and `netstandard2.0` (compatible with .NET 6/8/9+) |
 | Web UI / Blazor configurator | **Planned (V3)** | Browser-based pipeline designer |
 | REST API & AI-Agent integration | **Planned (V3)** | HTTP service for remote parsing pipelines |
 
@@ -284,8 +284,8 @@ All implementations use identical input objects and are asserted in setup to pro
 
 ## Requirements & Building
 
-- **Target:** .NET Framework 4.8
-- **SDK:** .NET 8.0 SDK or Visual Studio 2022
+- **Target Frameworks:** Core library: .NET Framework 4.8 & .NET Standard 2.0 (compatible with .NET 6/8/9+). WinForms UI: .NET Framework 4.8 (Windows).
+- **SDK:** .NET 8.0 SDK (version 8.0.100+) or Visual Studio 2022
 
 ```bash
 # Build the core library and tests

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48;net8.0</TargetFrameworks>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
     <AssemblyName>ColumnWeaver.NET.Tests</AssemblyName>
@@ -10,6 +10,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ColumnWeaver.NET\ColumnWeaver.NET.csproj" />
+    <ProjectReference Include="..\ColumnWeaver.NET.Core\ColumnWeaver.NET.Core.csproj" />
+    <ProjectReference Include="..\ColumnWeaver.NET.Application\ColumnWeaver.NET.Application.csproj" />
+    <ProjectReference Include="..\ColumnWeaver.NET.Infrastructure\ColumnWeaver.NET.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <ProjectReference Include="..\ColumnWeaver.NET.UI\ColumnWeaver.NET.UI.csproj" />
   </ItemGroup>
 

@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48;netstandard2.0</TargetFrameworks>
     <AssemblyName>ColumnWeaver.NET.Application</AssemblyName>
     <RootNamespace>ColumnWeaver.NET.Application</RootNamespace>
     <Nullable>enable</Nullable>

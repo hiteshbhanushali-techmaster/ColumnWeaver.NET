@@ -2,7 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48;netstandard2.0</TargetFrameworks>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
     <AssemblyName>ColumnWeaver.NET</AssemblyName>
     <RootNamespace>ColumnWeaver.NET</RootNamespace>
     <Nullable>enable</Nullable>
@@ -10,7 +11,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Company>ColumnWeaver</Company>
     <Product>ColumnWeaver.NET</Product>
-    <Description>Client-specific object-to-string formatting for .NET Framework 4.8. Reuse one transformation engine across products and customers with configurable columns, formulas, conditions, variables, separators, fixed-width output, null rules, replacements, JSON/XML schemas, and streaming batches.</Description>
+    <Description>Client-specific object-to-string formatting for .NET Framework 4.8 and .NET Standard 2.0 (compatible with modern .NET 6/8/9+). Reuse one transformation engine across products and customers with configurable columns, formulas, conditions, variables, separators, fixed-width output, null rules, replacements, JSON/XML schemas, and streaming batches.</Description>
     <PackageTitle>ColumnWeaver.NET</PackageTitle>
     <Version>1.0.0-beta</Version>
     <PackageVersion>1.0.0-beta</PackageVersion>
@@ -20,7 +21,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageTags>ColumnWeaver.NET;client-specific-formatting;configurable-data-export;object-to-string;string-formatting;data-transformation;delimited-export;fixed-width;financial;trading;formula-evaluator;conditional-mapping;custom-functions;JSON-configuration;XML-configuration;batch-processing;net48</PackageTags>
+    <PackageTags>ColumnWeaver.NET;client-specific-formatting;configurable-data-export;object-to-string;string-formatting;data-transformation;delimited-export;fixed-width;financial;trading;formula-evaluator;conditional-mapping;custom-functions;JSON-configuration;XML-configuration;batch-processing;net48;netstandard20</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>columnweaver-icon.png</PackageIcon>
     <IncludeSymbols>false</IncludeSymbols>
@@ -45,23 +46,23 @@
 
   <Target Name="AddColumnWeaverAssembliesToPackage">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)..\ColumnWeaver.NET.Core\bin\$(Configuration)\net48\ColumnWeaver.NET.Core.dll">
-        <PackagePath>lib/net48/</PackagePath>
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)..\ColumnWeaver.NET.Core\bin\$(Configuration)\$(TargetFramework)\ColumnWeaver.NET.Core.dll">
+        <PackagePath>lib/$(TargetFramework)/</PackagePath>
       </TfmSpecificPackageFile>
-      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)..\ColumnWeaver.NET.Application\bin\$(Configuration)\net48\ColumnWeaver.NET.Application.dll">
-        <PackagePath>lib/net48/</PackagePath>
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)..\ColumnWeaver.NET.Application\bin\$(Configuration)\$(TargetFramework)\ColumnWeaver.NET.Application.dll">
+        <PackagePath>lib/$(TargetFramework)/</PackagePath>
       </TfmSpecificPackageFile>
-      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)..\ColumnWeaver.NET.Infrastructure\bin\$(Configuration)\net48\ColumnWeaver.NET.Infrastructure.dll">
-        <PackagePath>lib/net48/</PackagePath>
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)..\ColumnWeaver.NET.Infrastructure\bin\$(Configuration)\$(TargetFramework)\ColumnWeaver.NET.Infrastructure.dll">
+        <PackagePath>lib/$(TargetFramework)/</PackagePath>
       </TfmSpecificPackageFile>
-      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)..\ColumnWeaver.NET.Core\bin\$(Configuration)\net48\ColumnWeaver.NET.Core.xml">
-        <PackagePath>lib/net48/</PackagePath>
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)..\ColumnWeaver.NET.Core\bin\$(Configuration)\$(TargetFramework)\ColumnWeaver.NET.Core.xml">
+        <PackagePath>lib/$(TargetFramework)/</PackagePath>
       </TfmSpecificPackageFile>
-      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)..\ColumnWeaver.NET.Application\bin\$(Configuration)\net48\ColumnWeaver.NET.Application.xml">
-        <PackagePath>lib/net48/</PackagePath>
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)..\ColumnWeaver.NET.Application\bin\$(Configuration)\$(TargetFramework)\ColumnWeaver.NET.Application.xml">
+        <PackagePath>lib/$(TargetFramework)/</PackagePath>
       </TfmSpecificPackageFile>
-      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)..\ColumnWeaver.NET.Infrastructure\bin\$(Configuration)\net48\ColumnWeaver.NET.Infrastructure.xml">
-        <PackagePath>lib/net48/</PackagePath>
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)..\ColumnWeaver.NET.Infrastructure\bin\$(Configuration)\$(TargetFramework)\ColumnWeaver.NET.Infrastructure.xml">
+        <PackagePath>lib/$(TargetFramework)/</PackagePath>
       </TfmSpecificPackageFile>
     </ItemGroup>
   </Target>

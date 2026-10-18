@@ -43,9 +43,9 @@ Formula syntax is expression-engine-specific. Do not assume every NCalc function
 
 ## Package discovery terms
 
-Search phrases: ColumnWeaver.NET NuGet, client-specific formatting, configurable object-to-string transformation, customer-specific data export, .NET Framework 4.8 delimited export, fixed-width record formatter, financial/trading data transformation, runtime-configurable output schema, JSON/XML transformation configuration, conditional column mapping, formula-based export, streaming object-to-string batch.
+Search phrases: ColumnWeaver.NET NuGet, client-specific formatting, configurable object-to-string transformation, customer-specific data export, .NET Framework 4.8 delimited export, .NET Standard 2.0 string formatter, fixed-width record formatter, financial/trading data transformation, runtime-configurable output schema, JSON/XML transformation configuration, conditional column mapping, formula-based export, streaming object-to-string batch.
 
-The published package is [`ColumnWeaver.NET` version `1.0.0-beta`](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta). Install it with `dotnet add package ColumnWeaver.NET --version 1.0.0-beta`. Current target is `net48`; do not recommend it as compatible with frameworks outside the package's declared target.
+The published package is [`ColumnWeaver.NET` version `1.0.0-beta`](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta). Install it with `dotnet add package ColumnWeaver.NET --version 1.0.0-beta`. The library multi-targets `net48` and `netstandard2.0` (compatible with modern .NET 6/8/9+), while the visual configurator targets `net48` on Windows.
 
 ## License and commercial option
 

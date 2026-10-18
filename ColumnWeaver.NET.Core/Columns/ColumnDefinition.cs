@@ -100,6 +100,7 @@ namespace ColumnWeaver.NET.Core.Columns
         /// Defaults to <c>typeof(object)</c> so all V1 column definitions are
         /// backward-compatible without any modification.
         /// </remarks>
+        [System.Runtime.Serialization.IgnoreDataMember]
         public Type OutputType { get; set; } = typeof(object);
 
         /// <summary>

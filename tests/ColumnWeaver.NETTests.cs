@@ -570,6 +570,7 @@ namespace ColumnWeaver.NET.Tests
             Assert.Contains("105", result);
         }
 
+#if NETFRAMEWORK
         [Fact]
         public void WinFormsPreview_MatchesPublicClient_AndSandboxParsesEquivalently()
         {
@@ -618,6 +619,7 @@ namespace ColumnWeaver.NET.Tests
             Assert.Equal(updatedClient, updatedPreview);
             Assert.NotEqual(previewOutput, updatedPreview);
         }
+#endif
 
         [Fact]
         public void BenchmarkScenarios_AllProduceEquivalentOutputs()
@@ -1244,6 +1246,86 @@ namespace ColumnWeaver.NET.Tests
 
             string expected = $"0|7|1001|-42|{int.MaxValue}|{int.MinValue}";
             Assert.Equal(expected, sb.ToString());
+        }
+
+        #endregion
+
+        #region Target Framework & Runtime Compatibility Tests
+
+        [Fact]
+        public void MultiTargeting_RuntimeCompatibility_FullPipelineExecutesIdentically()
+        {
+            var config = new ParserConfiguration
+            {
+                GlobalSeparator = ",",
+                PreserveSeparatorForDisabledColumns = false,
+                Variables =
+                {
+                    ["TaxRate"] = 0.08,
+                    ["ExportTag"] = "EXP-2026"
+                },
+                Columns =
+                {
+                    new FixedTextColumn { Name = "Tag", Text = "EXP-2026", Order = 1 },
+                    new PropertyColumn { Name = "Symbol", PropertyPath = "Symbol", Order = 2 },
+                    new PropertyColumn { Name = "Broker", PropertyPath = "Account.Broker", Order = 3 },
+                    new PropertyColumn { Name = "Shares", PropertyPath = "Shares", Order = 4 },
+                    new PropertyColumn { Name = "Price", PropertyPath = "Price", Order = 5 },
+                    new FormulaColumn { Name = "Gross", Expression = "${Shares} * ${Price}", Order = 6 },
+                    new FormulaColumn { Name = "Tax", Expression = "${Gross} * ${TaxRate}", Order = 7 },
+                    new FormulaColumn { Name = "NetTotal", Expression = "${Gross} + ${Tax}", Order = 8 },
+                    new ConditionalColumn
+                    {
+                        Name = "Priority",
+                        ConditionExpression = "${NetTotal} > 5000",
+                        TrueValue = "HIGH",
+                        FalseValue = "STANDARD",
+                        Order = 9
+                    },
+                    new CustomFunctionColumn
+                    {
+                        Name = "FormattedSymbol",
+                        FunctionName = "Upper",
+                        Parameters = new List<string> { "${Symbol}" },
+                        Order = 10
+                    }
+                }
+            };
+
+            var trade = new
+            {
+                Symbol = "aapl",
+                Shares = 100,
+                Price = 60.0,
+                Account = new { Broker = "Goldman" }
+            };
+
+            var parser = ColumnWeaverClient.CreatePrecompiled(config, trade.GetType());
+            var result = parser.Parse(trade);
+
+            // Gross = 6000, Tax = 480, NetTotal = 6480, Priority = HIGH, FormattedSymbol = AAPL
+            Assert.Equal("EXP-2026,aapl,Goldman,100,60,6000,480,6480,HIGH,AAPL", result);
+
+            // Verify streaming batch processing
+            var batch = new[] { trade, trade };
+            var batchLines = parser.ParseMany(batch).ToList();
+            Assert.Equal(2, batchLines.Count);
+            Assert.Equal(result, batchLines[0]);
+            Assert.Equal(result, batchLines[1]);
+
+            // Verify JSON serialization roundtrip compatibility
+            var jsonSerializer = new ColumnWeaver.NET.Infrastructure.Serialization.JsonConfigurationSerializer();
+            var json = jsonSerializer.Serialize(config);
+            var deserializedConfig = jsonSerializer.Deserialize(json);
+            var parserFromJson = ColumnWeaverClient.Create(deserializedConfig);
+            Assert.Equal(result, parserFromJson.Parse(trade));
+
+            // Verify XML serialization roundtrip compatibility
+            var xmlSerializer = new ColumnWeaver.NET.Infrastructure.Serialization.XmlConfigurationSerializer();
+            var xml = xmlSerializer.Serialize(config);
+            var deserializedXmlConfig = xmlSerializer.Deserialize(xml);
+            var parserFromXml = ColumnWeaverClient.Create(deserializedXmlConfig);
+            Assert.Equal(result, parserFromXml.Parse(trade));
         }
 
         #endregion

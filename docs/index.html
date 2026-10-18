@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Give each client or product its own data format without rewriting transformation code. ColumnWeaver.NET applies reusable formatting schemas in .NET Framework 4.8 applications, including trading and financial software.">
+  <meta name="description" content="Give each client or product its own data format without rewriting transformation code. ColumnWeaver.NET applies reusable formatting schemas in .NET Framework 4.8 and modern .NET (.NET 6/8/9+) applications, including trading and financial software.">
   <meta name="author" content="Hitesh Bhanushali">
-  <meta name="keywords" content="ColumnWeaver.NET, client-specific formatting, customer-specific data export, configurable object-to-string transformation, trading data formatting, financial market integration, delimited export, fixed-width records, .NET Framework 4.8, NuGet">
+  <meta name="keywords" content="ColumnWeaver.NET, client-specific formatting, customer-specific data export, configurable object-to-string transformation, trading data formatting, financial market integration, delimited export, fixed-width records, .NET Framework 4.8, .NET Standard 2.0, NuGet">
   <meta name="theme-color" content="#10152a">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ColumnWeaver.NET — configurable object-to-string pipelines">
@@ -64,8 +64,8 @@
     "name":"ColumnWeaver.NET",
     "applicationCategory":"DeveloperApplication",
     "operatingSystem":"Windows",
-    "softwareRequirements":".NET Framework 4.8",
-    "description":"A reusable .NET Framework library for applying client- and product-specific object-to-string formatting schemas without rewriting application transformation code.",
+    "softwareRequirements":".NET Framework 4.8 or .NET Standard 2.0 (.NET 6/8/9+)",
+    "description":"A reusable object-to-string transformation library for applying client- and product-specific formatting schemas without rewriting application transformation code.",
     "author":{"@type":"Person","name":"Hitesh Bhanushali"},
     "programmingLanguage":"C#"
     ,"keywords":"client-specific formatting, configurable object-to-string transformation, customer-specific export, trading data formatting, financial market integration, delimited records, fixed-width output"
@@ -81,9 +81,9 @@
       </nav>
       <div id="top" class="eyebrow">One transformation engine · client-owned output formats</div>
       <h1>Give every client the format they need—without rewriting your application.</h1>
-      <p class="lead">ColumnWeaver.NET lets a .NET Framework 4.8 application apply reusable formatting schemas to its data. Define columns, calculations, conditions, labels, separators, and value rules per client or product, then run them through the same compiled engine.</p>
+      <p class="lead">ColumnWeaver.NET lets a .NET Framework 4.8 or modern .NET (.NET 6/8/9+) application apply reusable formatting schemas to its data. Define columns, calculations, conditions, labels, separators, and value rules per client or product, then run them through the same compiled engine.</p>
       <div class="actions"><a class="button primary" href="https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta">Install from NuGet</a><a class="button" href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET">Explore the project</a><a class="button" href="#benchmarks">See measured performance</a></div>
-      <p class="muted">For client-specific exports and integrations, including trading and financial software · Current target: .NET Framework 4.8 · NuGet package: ColumnWeaver.NET 1.0.0-beta</p>
+      <p class="muted">For client-specific exports and integrations, including trading and financial software · Targets: .NET Framework 4.8 & .NET Standard 2.0 (.NET 6/8/9+) · NuGet package: ColumnWeaver.NET 1.0.0-beta</p>
     </div>
   </header>
   <main class="wrap">
@@ -91,7 +91,7 @@
       <div class="eyebrow">Why it exists</div><h2>Stop maintaining a separate formatter for every client</h2>
       <p class="lead">When each product or financial-market client asks for a different string layout, teams often copy transformation code or hard-code one more format. ColumnWeaver.NET moves those differences into reusable configuration so the application can keep one transformation implementation while applying the right schema for each client.</p>
       <div class="grid">
-        <article class="card"><h3>One integration</h3><p>Add the library to a compatible .NET Framework 4.8 application and reuse its transformation engine across formats.</p></article>
+        <article class="card"><h3>One integration</h3><p>Add the library to a compatible .NET Framework 4.8 or modern .NET application and reuse its transformation engine across formats.</p></article>
         <article class="card"><h3>Per-client schemas</h3><p>Vary field selection, order, labels, separators, formulas, conditions, and formatting rules per customer or product.</p></article>
         <article class="card"><h3>Less format-specific code</h3><p>Keep client layout differences in configuration instead of cloning and rewriting application conversion logic.</p></article>
       </div>
@@ -154,7 +154,7 @@
 
 var parser = ColumnWeaverClient.CreatePrecompiled(config, typeof(Order));
 string row = parser.Parse(order);</code></pre>
-      <p class="muted">Install the published <a href="https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta">ColumnWeaver.NET 1.0.0-beta package from NuGet</a> with <code>dotnet add package ColumnWeaver.NET --version 1.0.0-beta</code>. The package targets .NET Framework 4.8.</p>
+      <p class="muted">Install the published <a href="https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta">ColumnWeaver.NET 1.0.0-beta package from NuGet</a> with <code>dotnet add package ColumnWeaver.NET --version 1.0.0-beta</code>. The package targets .NET Framework 4.8 and .NET Standard 2.0 (compatible with modern .NET 6/8/9+).</p>
     </section>
     <section id="terms">
       <div class="eyebrow">Distribution terms</div><h2>AGPL community license, with a commercial option</h2>
@@ -166,6 +166,6 @@ string row = parser.Parse(order);</code></pre>
       <p>Concept and project direction: <strong>Hitesh Bhanushali</strong>. AI-assisted development tools: <strong>Codex 6 Luna</strong> and <strong>Antigravity with Gemini 3.8</strong>. The developer reviews and verifies each release; release-specific checks and benchmark details should accompany the published version.</p>
     </section>
   </main>
-  <footer><div class="wrap">ColumnWeaver.NET · .NET Framework 4.8 · Built for configurable object-to-string transformations.</div></footer>
+  <footer><div class="wrap">ColumnWeaver.NET · .NET Framework 4.8 & .NET Standard 2.0 · Built for configurable object-to-string transformations.</div></footer>
 </body>
 </html>
