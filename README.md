@@ -4,8 +4,9 @@
 
 [![Target](https://img.shields.io/badge/target-.NET%20Framework%204.8-blue.svg)](#requirements)
 [![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](#license)
+[![NuGet](https://img.shields.io/nuget/v/ColumnWeaver.NET.svg)](https://www.nuget.org/packages/ColumnWeaver.NET/)
 
-**Repository:** [GitHub](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET) · **Portfolio page:** [ColumnWeaver.NET release overview](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/) · **AI-readable project summary:** [llms.txt](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/llms.txt) · [Full AI reference](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/llms-full.txt) · [Source-verified feature and configurator guide](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/features.md) · **Full logo:** [PNG](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/Logo.png) · **Compact mark:** [PNG](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/docs/assets/columnweaver-mark.png) · **Package icon:** [128×128 PNG](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/docs/assets/columnweaver-icon.png)
+**Repository:** [GitHub](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET) · **NuGet:** [ColumnWeaver.NET](https://www.nuget.org/packages/ColumnWeaver.NET/) · **Portfolio page:** [ColumnWeaver.NET release overview](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/) · **AI-readable project summary:** [llms.txt](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/llms.txt) · [Full AI reference](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/llms-full.txt) · [Source-verified feature and configurator guide](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/features.md) · **Full logo:** [PNG](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/Logo.png) · **Compact mark:** [PNG](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/docs/assets/columnweaver-mark.png) · **Package icon:** [128×128 PNG](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/docs/assets/columnweaver-icon.png)
 
 ## Overview
 
@@ -49,6 +50,14 @@ The WinForms configurator is an authoring tool rather than a runtime dependency.
 ---
 
 ## Quick Start
+
+Install the published package into a compatible project:
+
+```powershell
+dotnet add package ColumnWeaver.NET --version 1.0.0-beta
+```
+
+The package targets .NET Framework 4.8. Review the [NuGet package page](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta) and [license](LICENSE) before integrating it.
 
 ```csharp
 using ColumnWeaver.NET;
