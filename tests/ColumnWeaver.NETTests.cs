@@ -1330,6 +1330,154 @@ namespace ColumnWeaver.NET.Tests
 
         #endregion
 
+        #region Comprehensive Expression Engine Regression Tests
+
+        [Fact]
+        public void ExpressionRegression_Arithmetic_AllOperatorsAndPrecedence()
+        {
+            var config = new ParserConfiguration
+            {
+                GlobalSeparator = "|",
+                Columns =
+                {
+                    new PropertyColumn { Name = "Price", PropertyPath = "UnitPrice", Order = 1 },
+                    new PropertyColumn { Name = "Qty", PropertyPath = "Quantity", Order = 2 },
+                    new FormulaColumn { Name = "ComplexArithmetic", Expression = "(${Price} * ${Qty}) - (50 / 2) + (10 % 3)", Order = 3 }
+                }
+            };
+
+            var parser = ColumnWeaverClient.Create(config);
+            var item = new { UnitPrice = 100.0, Quantity = 2 };
+            // (100 * 2) - 25 + 1 = 200 - 25 + 1 = 176
+            var result = parser.Parse(item);
+            Assert.Equal("100|2|176", result);
+        }
+
+        [Fact]
+        public void ExpressionRegression_BooleanConditions_ComparisonsAndLogicalOperators()
+        {
+            var config = new ParserConfiguration
+            {
+                GlobalSeparator = "|",
+                Columns =
+                {
+                    new PropertyColumn { Name = "Price", PropertyPath = "Price", Order = 1 },
+                    new PropertyColumn { Name = "Qty", PropertyPath = "Qty", Order = 2 },
+                    new PropertyColumn { Name = "IsActive", PropertyPath = "IsActive", Order = 3 },
+                    new ConditionalColumn
+                    {
+                        Name = "ComplexCondition",
+                        ConditionExpression = "(${Price} >= 100 && ${Qty} > 10) || (!${IsActive} && ${Price} < 50)",
+                        TrueValue = "ELIGIBLE",
+                        FalseValue = "INELIGIBLE",
+                        Order = 4
+                    }
+                }
+            };
+
+            var parser = ColumnWeaverClient.Create(config);
+
+            var item1 = new { Price = 150.0, Qty = 20, IsActive = true };
+            Assert.Contains("ELIGIBLE", parser.Parse(item1));
+
+            var item2 = new { Price = 150.0, Qty = 5, IsActive = true };
+            Assert.Contains("INELIGIBLE", parser.Parse(item2));
+
+            var item3 = new { Price = 30.0, Qty = 2, IsActive = false };
+            Assert.Contains("ELIGIBLE", parser.Parse(item3));
+        }
+
+        [Fact]
+        public void ExpressionRegression_VariableAndPropertyBinding_FlatAndNested()
+        {
+            var config = new ParserConfiguration
+            {
+                GlobalSeparator = "|",
+                Variables = { { "TaxRate", 0.05 }, { "Currency", "USD" } },
+                Columns =
+                {
+                    new PropertyColumn { Name = "Symbol", PropertyPath = "Symbol", Order = 1 },
+                    new PropertyColumn { Name = "Price", PropertyPath = "Price", Order = 2 },
+                    new PropertyColumn { Name = "City", PropertyPath = "Customer.City", Order = 3 },
+                    new FormulaColumn { Name = "TotalWithTax", Expression = "${Price} * (1 + ${TaxRate})", Order = 4 },
+                    new ConditionalColumn
+                    {
+                        Name = "CurrencyCheck",
+                        ConditionExpression = "${Currency} == 'USD'",
+                        TrueValue = "DOMESTIC",
+                        FalseValue = "INTERNATIONAL",
+                        Order = 5
+                    }
+                }
+            };
+
+            var parser = ColumnWeaverClient.Create(config);
+            var item = new
+            {
+                Symbol = "MSFT",
+                Price = 200.0,
+                Customer = new { City = "Redmond" }
+            };
+
+            var result = parser.Parse(item);
+            Assert.Contains("MSFT", result);
+            Assert.Contains("Redmond", result);
+            Assert.Contains("210", result);
+            Assert.Contains("DOMESTIC", result);
+        }
+
+        [Fact]
+        public void ExpressionRegression_CustomFunctions_PropAndFunctionRegistry()
+        {
+            var resolver = new ColumnWeaver.NET.Infrastructure.PropertyResolution.ReflectionPropertyResolver();
+            var ncalc = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.NCalcExpressionEngine(resolver);
+            var context = new ColumnWeaver.NET.Application.Engine.ColumnEvaluationContext(
+                new { Customer = new { Name = "Alice" } }, new ParserConfiguration());
+
+            // Test explicit prop() function in NCalc
+            var result = ncalc.Evaluate("prop('Customer.Name') + ' - Verified'", context);
+            Assert.Equal("Alice - Verified", result);
+        }
+
+        [Fact]
+        public void ExpressionRegression_StringOperationsAndEscaping()
+        {
+            var config = new ParserConfiguration
+            {
+                GlobalSeparator = "|",
+                Columns =
+                {
+                    new PropertyColumn { Name = "Code", PropertyPath = "Code", Order = 1 },
+                    new FormulaColumn { Name = "Formatted", Expression = "'[' + ${Code} + '] - item: \\'verified\\''", Order = 2 }
+                }
+            };
+
+            var parser = ColumnWeaverClient.Create(config);
+            var result = parser.Parse(new { Code = "TEST" });
+            Assert.Equal("TEST|[TEST] - item: 'verified'", result);
+        }
+
+        [Fact]
+        public void ExpressionRegression_ErrorHandling_SyntaxAndUndefined()
+        {
+            var resolver = new ColumnWeaver.NET.Infrastructure.PropertyResolution.ReflectionPropertyResolver();
+            var ncalc = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.NCalcExpressionEngine(resolver);
+            var context = new ColumnWeaver.NET.Application.Engine.ColumnEvaluationContext(
+                new { Price = 100 }, new ParserConfiguration());
+
+            // 1. Syntax error validation
+            Assert.False(ncalc.ValidateExpression("10 + * 2"));
+            Assert.True(ncalc.ValidateExpression("10 + 2"));
+
+            // 2. Syntax error evaluation throws InvalidOperationException
+            Assert.Throws<InvalidOperationException>(() => ncalc.Evaluate("10 + * 2", context));
+
+            // 3. Undefined identifier throws ArgumentException or InvalidOperationException
+            Assert.ThrowsAny<Exception>(() => ncalc.Evaluate("NonExistentField * 2", context));
+        }
+
+        #endregion
+
         #region Helper Methods
 
         private static ParserConfiguration CreateConfig(params ColumnDefinition[] columns)
