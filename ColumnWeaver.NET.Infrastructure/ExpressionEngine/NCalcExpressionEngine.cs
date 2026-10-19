@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using NCalc;
+using NCalc.Exceptions;
 using ColumnWeaver.NET.Core.Interfaces;
 
 namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
@@ -105,9 +106,14 @@ namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
                 var result = ncalc.Evaluate();
                 return result?.ToString() ?? string.Empty;
             }
-            catch (EvaluationException ex)
+            catch (NCalcException ex)
             {
-                // EvaluationException covers all NCalc 1.3.8 runtime failures,
+                if (ex.InnerException is OperationCanceledException occ)
+                    throw occ;
+                if (ex.InnerException is TimeoutException te)
+                    throw te;
+
+                // NCalcException covers all NCalc runtime and parser failures,
                 // including undefined parameters/identifiers.
                 throw new InvalidOperationException(
                     $"NCalc failed to evaluate expression '{expression}': {ex.Message}", ex);
@@ -129,8 +135,13 @@ namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
             {
                 return ncalc.Evaluate();
             }
-            catch (EvaluationException ex)
+            catch (NCalcException ex)
             {
+                if (ex.InnerException is OperationCanceledException occ)
+                    throw occ;
+                if (ex.InnerException is TimeoutException te)
+                    throw te;
+
                 throw new InvalidOperationException(
                     $"NCalc failed to evaluate expression '{expression}': {ex.Message}", ex);
             }
@@ -161,8 +172,13 @@ namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
                 // Allow numeric / string truthy coercions.
                 return Convert.ToBoolean(result);
             }
-            catch (EvaluationException ex)
+            catch (NCalcException ex)
             {
+                if (ex.InnerException is OperationCanceledException occ)
+                    throw occ;
+                if (ex.InnerException is TimeoutException te)
+                    throw te;
+
                 throw new InvalidOperationException(
                     $"NCalc failed to evaluate condition '{conditionExpression}': {ex.Message}", ex);
             }
@@ -195,7 +211,7 @@ namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
                 try
                 {
                     var normalized = TokenPattern.Replace(expr, "[$1]");
-                    var ncalc = new Expression(normalized, EvaluateOptions.IgnoreCase);
+                    var ncalc = new Expression(normalized, ExpressionOptions.IgnoreCaseAtBuiltInFunctions);
                     return !ncalc.HasErrors();
                 }
                 catch
@@ -261,8 +277,8 @@ namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
         /// </remarks>
         private Expression BuildExpression(string expression, IExecutionContext context)
         {
-            // EvaluateOptions.IgnoreCase: function and parameter names are case-insensitive.
-            var ncalc = new Expression(expression, EvaluateOptions.IgnoreCase);
+            // ExpressionOptions.IgnoreCaseAtBuiltInFunctions: function names are case-insensitive.
+            var ncalc = new Expression(expression, ExpressionOptions.IgnoreCaseAtBuiltInFunctions);
 
             // ── EvaluateParameter: resolves identifiers against the source object ──────
             ncalc.EvaluateParameter += (name, args) =>
@@ -300,11 +316,14 @@ namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
                         args.Result = _propertyResolver.Resolve(source, name);
                     // If not resolvable, leave args.Result unset.
                 }
-                catch (Exception ex) when (ex is not OutOfMemoryException)
+                catch (Exception ex) when (ex is not OutOfMemoryException
+                                        && ex is not OperationCanceledException
+                                        && ex is not TimeoutException)
                 {
                     // A resolver exception for this identifier — leave args.Result unset
                     // and let NCalc report an unknown-parameter error.
-                    // OutOfMemoryException is NOT caught here to avoid masking critical failures.
+                    // OutOfMemoryException, OperationCanceledException, and TimeoutException
+                    // are NOT caught here so critical cancellation/timeout failures propagate.
                     _ = ex;
                 }
             };
@@ -313,21 +332,24 @@ namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
             ncalc.EvaluateFunction += (name, args) =>
             {
                 if (!name.Equals("prop", StringComparison.OrdinalIgnoreCase)) return;
-                if (args.Parameters.Length < 1) return;
+                if (args.Parameters.Count < 1) return;
                 
                 var source = context?.Source;
                 if (source == null) { args.Result = null; return; }
 
                 try
                 {
-                    var path = args.Parameters[0].Evaluate() as string;
+                    var path = args.Parameters.Evaluate(0) as string;
 
                     if (!string.IsNullOrEmpty(path))
                         args.Result = _propertyResolver.Resolve(source, path!);
                 }
-                catch
+                catch (Exception ex) when (ex is not OutOfMemoryException
+                                        && ex is not OperationCanceledException
+                                        && ex is not TimeoutException)
                 {
                     // Gracefully return null for unresolvable prop() calls.
+                    // Critical cancellation and timeout exceptions are allowed to propagate.
                     args.Result = null;
                 }
             };

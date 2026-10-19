@@ -62,6 +62,7 @@ namespace ColumnWeaver.NET
             _engine.Options.AllowWarnings = _options.AllowWarnings;
             if (_options.Timeout.HasValue)
                 _engine.Options.Timeout = _options.Timeout.Value;
+            _engine.Options.CancellationToken = _options.CancellationToken;
 
             if (_options.IsFrozen)
             {
@@ -171,7 +172,9 @@ namespace ColumnWeaver.NET
                     plan = GetOrCompileFrozenPlan(inputType);
                 }
 
-                if (plan.FastRowExecutor != null && !_options.EnableDiagnostics && !_options.Timeout.HasValue)
+                if (plan.FastRowExecutor != null && !_options.EnableDiagnostics
+                    && (!_options.Timeout.HasValue || _options.Timeout.Value == System.Threading.Timeout.InfiniteTimeSpan)
+                    && !_options.CancellationToken.CanBeCanceled)
                 {
                     var sb = _threadStringBuilder ?? (_threadStringBuilder = new System.Text.StringBuilder(256));
                     sb.Clear();

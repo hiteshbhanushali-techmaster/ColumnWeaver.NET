@@ -101,7 +101,7 @@ namespace ColumnWeaver.NET.Application.Engine
         {
             if (plan == null) throw new ArgumentNullException(nameof(plan));
 
-            if (plan.FastRowExecutor != null && !Options.DebugMode && Options.Timeout == Timeout.InfiniteTimeSpan)
+            if (plan.FastRowExecutor != null && !Options.DebugMode && Options.Timeout == Timeout.InfiniteTimeSpan && !Options.CancellationToken.CanBeCanceled)
             {
                 var sb = _threadStringBuilder ?? (_threadStringBuilder = new StringBuilder(256));
                 sb.Clear();
@@ -202,6 +202,9 @@ namespace ColumnWeaver.NET.Application.Engine
 
                 while (enumerator.MoveNext())
                 {
+                    if (opts.CancellationToken.IsCancellationRequested)
+                        opts.CancellationToken.ThrowIfCancellationRequested();
+
                     yield return ProcessRow(plan, enumerator.Current, sb, opts);
                 }
             }
@@ -238,6 +241,9 @@ namespace ColumnWeaver.NET.Application.Engine
 
                 while (enumerator.MoveNext())
                 {
+                    if (opts.CancellationToken.IsCancellationRequested)
+                        opts.CancellationToken.ThrowIfCancellationRequested();
+
                     yield return ProcessRow(plan, enumerator.Current, sb, opts);
                 }
             }
@@ -249,7 +255,7 @@ namespace ColumnWeaver.NET.Application.Engine
             StringBuilder   sb,
             ExecutionOptions opts)
         {
-            if (plan.FastRowExecutor != null && !opts.DebugMode && opts.Timeout == Timeout.InfiniteTimeSpan)
+            if (plan.FastRowExecutor != null && !opts.DebugMode && opts.Timeout == Timeout.InfiniteTimeSpan && !opts.CancellationToken.CanBeCanceled)
             {
                 sb.Clear();
                 var fastResult = plan.FastRowExecutor(source, sb);
@@ -321,20 +327,45 @@ namespace ColumnWeaver.NET.Application.Engine
             ExecutionOptions opts,
             object?          source)
         {
+            var token = opts?.CancellationToken ?? CancellationToken.None;
+            if (token.IsCancellationRequested)
+                token.ThrowIfCancellationRequested();
+
             var timeout = opts?.Timeout ?? Timeout.InfiniteTimeSpan;
-            var deadline = timeout == Timeout.InfiniteTimeSpan
-                ? DateTime.MaxValue
-                : DateTime.UtcNow.Add(timeout);
+            DateTime deadline;
+            if (timeout == Timeout.InfiniteTimeSpan)
+            {
+                deadline = DateTime.MaxValue;
+            }
+            else if (timeout <= TimeSpan.Zero)
+            {
+                deadline = DateTime.MinValue;
+            }
+            else
+            {
+                var now = DateTime.UtcNow;
+                deadline = (DateTime.MaxValue - now > timeout) ? now.Add(timeout) : DateTime.MaxValue;
+            }
 
             foreach (var node in plan.EvaluationOrder)
             {
                 if (!node.IsEnabled) continue;
 
-                if (deadline != DateTime.MaxValue && DateTime.UtcNow > deadline)
+                if (token.IsCancellationRequested)
+                    token.ThrowIfCancellationRequested();
+
+                if (deadline != DateTime.MaxValue && DateTime.UtcNow >= deadline)
                     throw new TimeoutException(
                         $"Execution timeout of {timeout} exceeded at column '{node.ColumnName}'.");
 
                 ExecuteNode(node, context);
+
+                if (token.IsCancellationRequested)
+                    token.ThrowIfCancellationRequested();
+
+                if (deadline != DateTime.MaxValue && DateTime.UtcNow >= deadline)
+                    throw new TimeoutException(
+                        $"Execution timeout of {timeout} exceeded at column '{node.ColumnName}'.");
             }
         }
 
@@ -344,16 +375,34 @@ namespace ColumnWeaver.NET.Application.Engine
             ExecutionOptions  opts,
             ExecutionTracer   tracer)
         {
+            var token = opts?.CancellationToken ?? CancellationToken.None;
+            if (token.IsCancellationRequested)
+                token.ThrowIfCancellationRequested();
+
             var timeout  = opts?.Timeout ?? Timeout.InfiniteTimeSpan;
-            var deadline = timeout == Timeout.InfiniteTimeSpan
-                ? DateTime.MaxValue
-                : DateTime.UtcNow.Add(timeout);
+            DateTime deadline;
+            if (timeout == Timeout.InfiniteTimeSpan)
+            {
+                deadline = DateTime.MaxValue;
+            }
+            else if (timeout <= TimeSpan.Zero)
+            {
+                deadline = DateTime.MinValue;
+            }
+            else
+            {
+                var now = DateTime.UtcNow;
+                deadline = (DateTime.MaxValue - now > timeout) ? now.Add(timeout) : DateTime.MaxValue;
+            }
 
             foreach (var node in plan.EvaluationOrder)
             {
                 if (!node.IsEnabled) continue;
 
-                if (deadline != DateTime.MaxValue && DateTime.UtcNow > deadline)
+                if (token.IsCancellationRequested)
+                    token.ThrowIfCancellationRequested();
+
+                if (deadline != DateTime.MaxValue && DateTime.UtcNow >= deadline)
                     throw new TimeoutException(
                         $"Execution timeout of {timeout} exceeded at column '{node.ColumnName}'.");
 
@@ -382,6 +431,13 @@ namespace ColumnWeaver.NET.Application.Engine
                     else
                         tracer.EndNode(result);
                 }
+
+                if (token.IsCancellationRequested)
+                    token.ThrowIfCancellationRequested();
+
+                if (deadline != DateTime.MaxValue && DateTime.UtcNow >= deadline)
+                    throw new TimeoutException(
+                        $"Execution timeout of {timeout} exceeded at column '{node.ColumnName}'.");
             }
         }
 

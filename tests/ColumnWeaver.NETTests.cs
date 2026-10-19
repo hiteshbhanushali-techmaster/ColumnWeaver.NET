@@ -1476,6 +1476,367 @@ namespace ColumnWeaver.NET.Tests
             Assert.ThrowsAny<Exception>(() => ncalc.Evaluate("NonExistentField * 2", context));
         }
 
+        [Fact]
+        public void ExpressionRegression_BuiltInFunctions_MathAndTernary()
+        {
+            var config = new ParserConfiguration
+            {
+                GlobalSeparator = "|",
+                Columns =
+                {
+                    new PropertyColumn { Name = "Val", PropertyPath = "Value", Order = 1 },
+                    new FormulaColumn { Name = "AbsVal", Expression = "Abs(${Val})", Order = 2 },
+                    new FormulaColumn { Name = "Rounded", Expression = "Round(3.14159, 2)", Order = 3 },
+                    new FormulaColumn { Name = "Ternary", Expression = "if(${Val} < 0, 'Negative', 'Positive')", Order = 4 }
+                }
+            };
+
+            var parser = ColumnWeaverClient.Create(config);
+            var result = parser.Parse(new { Value = -42.5 });
+            Assert.Equal("-42.5|42.5|3.14|Negative", result);
+        }
+
+        [Fact]
+        public void ExpressionRegression_NullHandling_InExpressionsAndProp()
+        {
+            var resolver = new ColumnWeaver.NET.Infrastructure.PropertyResolution.ReflectionPropertyResolver();
+            var ncalc = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.NCalcExpressionEngine(resolver);
+            var context = new ColumnWeaver.NET.Application.Engine.ColumnEvaluationContext(
+                new { NullableValue = (string?)null }, new ParserConfiguration());
+
+            // prop() with unresolvable or null path returns null, which Evaluate converts to string.Empty
+            var result = ncalc.Evaluate("prop('NonExistent.Property')", context);
+            Assert.Equal(string.Empty, result);
+
+            // Null context source returns string.Empty
+            var nullSourceContext = new ColumnWeaver.NET.Application.Engine.ColumnEvaluationContext(
+                null!, new ParserConfiguration());
+            var nullResult = ncalc.Evaluate("prop('Any.Property')", nullSourceContext);
+            Assert.Equal(string.Empty, nullResult);
+        }
+
+        [Fact]
+        public void ExpressionRegression_SyntaxValidationAndUnresolvedCalls()
+        {
+            var resolver = new ColumnWeaver.NET.Infrastructure.PropertyResolution.ReflectionPropertyResolver();
+            var ncalc = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.NCalcExpressionEngine(resolver);
+            var context = new ColumnWeaver.NET.Application.Engine.ColumnEvaluationContext(
+                new { Value = 100 }, new ParserConfiguration());
+
+            // 1. Empty or whitespace expressions reject immediately
+            Assert.False(ncalc.ValidateExpression(""));
+            Assert.False(ncalc.ValidateExpression("   "));
+            Assert.Throws<ArgumentException>(() => ncalc.Evaluate("", context));
+            Assert.Throws<ArgumentException>(() => ncalc.Evaluate("   ", context));
+
+            // 2. Unbalanced brackets or invalid syntax safely rejected by validator
+            Assert.False(ncalc.ValidateExpression("(${Value} * 2"));
+            Assert.False(ncalc.ValidateExpression("${Value} +++ 2"));
+            Assert.False(ncalc.ValidateExpression("10 / * 2"));
+
+            // 3. Expressions cannot execute arbitrary CLR types or reflection
+            Assert.ThrowsAny<Exception>(() => ncalc.Evaluate("System.IO.File.Delete('test.txt')", context));
+        }
+
+        [Fact]
+        public void ExpressionRegression_CancellationAndTimeout_ExceptionsPropagateWithoutSwallowing()
+        {
+            var mockResolver = new MockFailingPropertyResolver();
+            var ncalc = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.NCalcExpressionEngine(mockResolver);
+            var context = new ColumnWeaver.NET.Application.Engine.ColumnEvaluationContext(
+                new object(), new ParserConfiguration());
+
+            // 1. OperationCanceledException thrown from resolver must propagate without being swallowed
+            mockResolver.ExceptionToThrow = new OperationCanceledException("Operation was canceled");
+            Assert.Throws<OperationCanceledException>(() => ncalc.Evaluate("AnyProperty + 1", context));
+            Assert.Throws<OperationCanceledException>(() => ncalc.EvaluateCondition("AnyProperty > 0", context));
+            Assert.Throws<OperationCanceledException>(() => ncalc.Evaluate("prop('AnyProperty')", context));
+
+            // 2. TimeoutException thrown from resolver must propagate without being swallowed
+            mockResolver.ExceptionToThrow = new TimeoutException("Operation timed out");
+            Assert.Throws<TimeoutException>(() => ncalc.Evaluate("AnyProperty + 1", context));
+            Assert.Throws<TimeoutException>(() => ncalc.EvaluateCondition("AnyProperty > 0", context));
+            Assert.Throws<TimeoutException>(() => ncalc.Evaluate("prop('AnyProperty')", context));
+        }
+
+        [Fact]
+        public void PipelineTimeout_SlowFirstColumn_ThrowsTimeoutExceptionAfterFirstColumn()
+        {
+            var config = new ParserConfiguration
+            {
+                GlobalSeparator = "|",
+                Columns =
+                {
+                    new CustomFunctionColumn
+                    {
+                        Name = "SlowFirst",
+                        FunctionName = "SlowFunc1",
+                        Order = 1
+                    },
+                    new FormulaColumn
+                    {
+                        Name = "NextCol",
+                        Expression = "10 + 20",
+                        Order = 2
+                    }
+                }
+            };
+
+            var registry = new ColumnWeaver.NET.Infrastructure.DefaultFunctionRegistry();
+            registry.Register("SlowFunc1", (src, args) =>
+            {
+                System.Threading.Thread.Sleep(60);
+                return "DONE";
+            }, typeof(string));
+
+            var resolver = new ColumnWeaver.NET.Infrastructure.PropertyResolution.ReflectionPropertyResolver();
+            var ncalc = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.NCalcExpressionEngine(resolver);
+            var lambda = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.LambdaExpressionEngine(ncalc);
+            var engine = new ColumnWeaver.NET.Application.Engine.CompiledParserEngine(resolver, lambda, registry);
+            engine.Options.Timeout = TimeSpan.FromMilliseconds(25);
+
+            var ex = Assert.Throws<TimeoutException>(() => engine.Parse(config, new object()));
+            Assert.Contains("SlowFirst", ex.Message);
+        }
+
+        [Fact]
+        public void PipelineTimeout_SlowFinalColumn_ThrowsTimeoutExceptionAfterFinalColumn()
+        {
+            var config = new ParserConfiguration
+            {
+                GlobalSeparator = "|",
+                Columns =
+                {
+                    new FixedTextColumn
+                    {
+                        Name = "FastFirst",
+                        Text = "FAST",
+                        Order = 1
+                    },
+                    new CustomFunctionColumn
+                    {
+                        Name = "SlowFinal",
+                        FunctionName = "SlowFuncFinal",
+                        Order = 2
+                    }
+                }
+            };
+
+            var registry = new ColumnWeaver.NET.Infrastructure.DefaultFunctionRegistry();
+            registry.Register("SlowFuncFinal", (src, args) =>
+            {
+                System.Threading.Thread.Sleep(60);
+                return "DONE";
+            }, typeof(string));
+
+            var resolver = new ColumnWeaver.NET.Infrastructure.PropertyResolution.ReflectionPropertyResolver();
+            var ncalc = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.NCalcExpressionEngine(resolver);
+            var lambda = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.LambdaExpressionEngine(ncalc);
+            var engine = new ColumnWeaver.NET.Application.Engine.CompiledParserEngine(resolver, lambda, registry);
+            engine.Options.Timeout = TimeSpan.FromMilliseconds(25);
+
+            var ex = Assert.Throws<TimeoutException>(() => engine.Parse(config, new object()));
+            Assert.Contains("SlowFinal", ex.Message);
+        }
+
+        [Fact]
+        public void PipelineTimeout_ExpiredBeforeFirstColumn_ThrowsTimeoutExceptionImmediately()
+        {
+            bool columnExecuted = false;
+            var config = new ParserConfiguration
+            {
+                GlobalSeparator = "|",
+                Columns =
+                {
+                    new CustomFunctionColumn
+                    {
+                        Name = "GuardedCol",
+                        FunctionName = "CheckFlagFunc",
+                        Order = 1
+                    }
+                }
+            };
+
+            var registry = new ColumnWeaver.NET.Infrastructure.DefaultFunctionRegistry();
+            registry.Register("CheckFlagFunc", (src, args) =>
+            {
+                columnExecuted = true;
+                return "OK";
+            }, typeof(string));
+
+            var resolver = new ColumnWeaver.NET.Infrastructure.PropertyResolution.ReflectionPropertyResolver();
+            var ncalc = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.NCalcExpressionEngine(resolver);
+            var lambda = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.LambdaExpressionEngine(ncalc);
+            var engine = new ColumnWeaver.NET.Application.Engine.CompiledParserEngine(resolver, lambda, registry);
+
+            // Non-positive timeout (TimeSpan.Zero or negative) is expired at start
+            engine.Options.Timeout = TimeSpan.Zero;
+
+            var ex = Assert.Throws<TimeoutException>(() => engine.Parse(config, new object()));
+            Assert.Contains("GuardedCol", ex.Message);
+            Assert.False(columnExecuted, "Column node should not execute when timeout is already expired before start.");
+        }
+
+        [Fact]
+        public void PipelineTimeout_DisabledColumnsAndEmptyPlan_DoesNotThrow()
+        {
+            var resolver = new ColumnWeaver.NET.Infrastructure.PropertyResolution.ReflectionPropertyResolver();
+            var ncalc = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.NCalcExpressionEngine(resolver);
+            var lambda = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.LambdaExpressionEngine(ncalc);
+            var engine = new ColumnWeaver.NET.Application.Engine.CompiledParserEngine(resolver, lambda);
+            engine.Options.Timeout = TimeSpan.FromMilliseconds(25);
+
+            // 1. Empty configuration
+            var emptyConfig = new ParserConfiguration();
+            var emptyResult = engine.Parse(emptyConfig, new object());
+            Assert.Equal(string.Empty, emptyResult);
+
+            // 2. Configuration where all columns are disabled
+            var disabledConfig = new ParserConfiguration
+            {
+                Columns =
+                {
+                    new FixedTextColumn { Name = "Dis1", Text = "ABC", IsEnabled = false, Order = 1 },
+                    new FormulaColumn { Name = "Dis2", Expression = "10 + 20", IsEnabled = false, Order = 2 }
+                }
+            };
+            var disabledResult = engine.Parse(disabledConfig, new object());
+            Assert.Equal(string.Empty, disabledResult);
+        }
+
+        [Fact]
+        public void PipelineTimeout_InfiniteOrDefaultTimeout_RunsToCompletion()
+        {
+            var config = new ParserConfiguration
+            {
+                GlobalSeparator = "|",
+                Columns =
+                {
+                    new CustomFunctionColumn
+                    {
+                        Name = "WorkCol",
+                        FunctionName = "WorkFunc",
+                        Order = 1
+                    },
+                    new FormulaColumn
+                    {
+                        Name = "CalcCol",
+                        Expression = "5 * 5",
+                        Order = 2
+                    }
+                }
+            };
+
+            var registry = new ColumnWeaver.NET.Infrastructure.DefaultFunctionRegistry();
+            registry.Register("WorkFunc", (src, args) =>
+            {
+                System.Threading.Thread.Sleep(30);
+                return "DONE";
+            }, typeof(string));
+
+            var resolver = new ColumnWeaver.NET.Infrastructure.PropertyResolution.ReflectionPropertyResolver();
+            var ncalc = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.NCalcExpressionEngine(resolver);
+            var lambda = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.LambdaExpressionEngine(ncalc);
+            var engine = new ColumnWeaver.NET.Application.Engine.CompiledParserEngine(resolver, lambda, registry);
+
+            // Infinite timeout
+            engine.Options.Timeout = System.Threading.Timeout.InfiniteTimeSpan;
+            var result = engine.Parse(config, new object());
+            Assert.Equal("DONE|25", result);
+        }
+
+        [Fact]
+        public void PipelineCancellation_CooperativeCancellation_CancelsBetweenColumnsAndRows()
+        {
+            // 1. Pre-canceled token cancels immediately before first column
+            bool firstColRan = false;
+            var config = new ParserConfiguration
+            {
+                GlobalSeparator = "|",
+                Columns =
+                {
+                    new CustomFunctionColumn { Name = "Col1", FunctionName = "Func1", Order = 1 },
+                    new CustomFunctionColumn { Name = "Col2", FunctionName = "Func2", Order = 2 }
+                }
+            };
+
+            var registry = new ColumnWeaver.NET.Infrastructure.DefaultFunctionRegistry();
+            registry.Register("Func1", (src, args) => { firstColRan = true; return "1"; }, typeof(string));
+            registry.Register("Func2", (src, args) => "2", typeof(string));
+
+            var resolver = new ColumnWeaver.NET.Infrastructure.PropertyResolution.ReflectionPropertyResolver();
+            var ncalc = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.NCalcExpressionEngine(resolver);
+            var lambda = new ColumnWeaver.NET.Infrastructure.ExpressionEngine.LambdaExpressionEngine(ncalc);
+            var engine = new ColumnWeaver.NET.Application.Engine.CompiledParserEngine(resolver, lambda, registry);
+
+            using (var preCts = new System.Threading.CancellationTokenSource())
+            {
+                preCts.Cancel();
+                engine.Options.CancellationToken = preCts.Token;
+                Assert.Throws<OperationCanceledException>(() => engine.Parse(config, new object()));
+                Assert.False(firstColRan, "Column 1 should not execute when token is pre-canceled.");
+            }
+
+            // 2. Cancellation signaled during column 1 cancels before column 2
+            bool secondColRan = false;
+            using (var midCts = new System.Threading.CancellationTokenSource())
+            {
+                var midRegistry = new ColumnWeaver.NET.Infrastructure.DefaultFunctionRegistry();
+                midRegistry.Register("Func1", (src, args) =>
+                {
+                    midCts.Cancel();
+                    return "CANCELLED_AFTER_1";
+                }, typeof(string));
+                midRegistry.Register("Func2", (src, args) =>
+                {
+                    secondColRan = true;
+                    return "2";
+                }, typeof(string));
+
+                var midEngine = new ColumnWeaver.NET.Application.Engine.CompiledParserEngine(resolver, lambda, midRegistry);
+                midEngine.Options.CancellationToken = midCts.Token;
+
+                Assert.Throws<OperationCanceledException>(() => midEngine.Parse(config, new object()));
+                Assert.False(secondColRan, "Column 2 should not execute after token was canceled in Column 1.");
+            }
+
+            // 3. Batch ParseMany cancels between rows
+            using (var batchCts = new System.Threading.CancellationTokenSource())
+            {
+                var batchRegistry = new ColumnWeaver.NET.Infrastructure.DefaultFunctionRegistry();
+                batchRegistry.Register("Func1", (src, args) => "1", typeof(string));
+                batchRegistry.Register("Func2", (src, args) => "2", typeof(string));
+
+                var batchEngine = new ColumnWeaver.NET.Application.Engine.CompiledParserEngine(resolver, lambda, batchRegistry);
+                batchEngine.Options.CancellationToken = batchCts.Token;
+
+                var items = new[] { new object(), new object(), new object(), new object() };
+                var enumerator = batchEngine.ParseMany(config, items).GetEnumerator();
+
+                Assert.True(enumerator.MoveNext()); // Row 1 completes
+                Assert.Equal("1|2", enumerator.Current);
+
+                batchCts.Cancel(); // Signal cancellation between rows
+
+                Assert.Throws<OperationCanceledException>(() => enumerator.MoveNext()); // Row 2 aborts
+            }
+        }
+
+        private sealed class MockFailingPropertyResolver : ColumnWeaver.NET.Core.Interfaces.IPropertyResolver
+        {
+            public Exception? ExceptionToThrow { get; set; }
+
+            public bool CanResolve(Type sourceType, string propertyPath) => true;
+
+            public Type? ResolveType(Type sourceType, string propertyPath) => typeof(int);
+
+            public object? Resolve(object source, string propertyPath)
+            {
+                if (ExceptionToThrow != null) throw ExceptionToThrow;
+                return 42;
+            }
+        }
+
         #endregion
 
         #region Helper Methods

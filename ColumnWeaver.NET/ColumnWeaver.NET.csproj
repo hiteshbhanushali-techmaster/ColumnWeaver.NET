@@ -34,15 +34,8 @@
     <ProjectReference Include="..\ColumnWeaver.NET.Infrastructure\ColumnWeaver.NET.Infrastructure.csproj" PrivateAssets="all" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-    <PackageReference Include="NCalc" Version="1.3.8" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' != 'net48'">
-    <PackageReference Include="CoreCLR-NCalc" Version="3.1.253" />
-  </ItemGroup>
-
   <ItemGroup>
+    <PackageReference Include="NCalc" Version="7.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 

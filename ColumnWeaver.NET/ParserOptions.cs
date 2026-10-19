@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace ColumnWeaver.NET
 {
@@ -38,11 +39,26 @@ namespace ColumnWeaver.NET
         public bool AllowWarnings { get; set; }
 
         /// <summary>
-        /// Gets or sets the maximum time allowed for a single parse operation.
+        /// Gets or sets the maximum duration allowed for a single row parse operation.
         /// Applies to each item when parsing multiple rows.
         /// Default is null (no timeout).
         /// </summary>
+        /// <remarks>
+        /// Timeout enforcement operates cooperatively by checking deadlines before and after
+        /// each column node. A slow column causes a <see cref="TimeoutException"/> to be reported
+        /// after that column returns; in-flight synchronous expressions or custom functions
+        /// cannot be preemptively aborted while running.
+        /// </remarks>
         public TimeSpan? Timeout { get; set; }
+
+        /// <summary>
+        /// Gets or sets an optional cancellation token to cooperatively cancel execution
+        /// between column evaluations and between rows in batch processing.
+        /// In-flight synchronous expressions, custom functions, and property resolutions
+        /// cannot be preemptively interrupted mid-execution.
+        /// Default is <see cref="CancellationToken.None"/>.
+        /// </summary>
+        public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
         /// <summary>
         /// Gets or sets a value indicating whether the client configuration is frozen/immutable.
@@ -66,6 +82,13 @@ namespace ColumnWeaver.NET
             => new ParserOptions { Timeout = timeout };
 
         /// <summary>
+        /// Creates a new <see cref="ParserOptions"/> with a cancellation token.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token to observe.</param>
+        public static ParserOptions WithCancellationToken(CancellationToken cancellationToken)
+            => new ParserOptions { CancellationToken = cancellationToken };
+
+        /// <summary>
         /// Creates a deep copy of this <see cref="ParserOptions"/> instance.
         /// </summary>
         public ParserOptions Clone()
@@ -75,7 +98,8 @@ namespace ColumnWeaver.NET
                 EnableDiagnostics = this.EnableDiagnostics,
                 AllowWarnings = this.AllowWarnings,
                 Timeout = this.Timeout,
-                IsFrozen = this.IsFrozen
+                IsFrozen = this.IsFrozen,
+                CancellationToken = this.CancellationToken
             };
         }
     }

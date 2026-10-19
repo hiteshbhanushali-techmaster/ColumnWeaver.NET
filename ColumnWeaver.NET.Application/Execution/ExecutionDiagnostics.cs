@@ -27,12 +27,26 @@ namespace ColumnWeaver.NET.Application.Execution
         public bool AllowWarnings { get; set; }
 
         /// <summary>
-        /// Gets or sets the maximum time allowed for a single parse operation
-        /// (per item in a batch). A value of <see cref="Timeout.Infinite"/>
-        /// means no timeout.
-        /// Default is <see cref="Timeout.Infinite"/>.
+        /// Gets or sets the maximum duration allowed for a single row parse operation
+        /// (per item in a batch). A value of <see cref="Timeout.InfiniteTimeSpan"/>
+        /// means no timeout. Default is <see cref="Timeout.InfiniteTimeSpan"/>.
         /// </summary>
+        /// <remarks>
+        /// Timeout enforcement operates cooperatively by checking deadlines before and after
+        /// each column node. A slow column causes a <see cref="TimeoutException"/> to be reported
+        /// after that column returns; in-flight synchronous expressions or custom functions
+        /// cannot be preemptively aborted while running.
+        /// </remarks>
         public TimeSpan Timeout { get; set; } = System.Threading.Timeout.InfiniteTimeSpan;
+
+        /// <summary>
+        /// Gets or sets an optional cancellation token to cooperatively cancel execution
+        /// between column evaluations and between rows in batch processing.
+        /// In-flight synchronous expressions, custom functions, and property resolutions
+        /// cannot be preemptively interrupted mid-execution.
+        /// Default is <see cref="CancellationToken.None"/>.
+        /// </summary>
+        public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
         /// <summary>
         /// Creates a default <see cref="ExecutionOptions"/> with all debug features disabled.
