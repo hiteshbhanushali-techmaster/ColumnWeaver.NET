@@ -16,6 +16,10 @@ ColumnWeaver.NET exists to let each client or product define its own output form
 
 This is especially useful in trading and financial software, where multiple products, integrations, or clients may require different field selection, ordering, labels, calculations, conditions, separators, and value formatting. Instead of copying and rewriting transformation code for every project or customer, the application can reuse ColumnWeaver.NET and supply a different schema for each output contract.
 
+See the [client-specific trading record guide](docs/use-cases/client-specific-trading-records.md) for an illustrative example that applies two output schemas to the same execution object, including a fixed label, a conditional side code, and a calculated notional.
+
+The same scenario is available as runnable code in [`Example11_ClientSpecificTradingRecords`](examples/Program.cs). Run the examples on Windows with `dotnet run --project examples/ColumnWeaver.NET.Examples.csproj -c Release`.
+
 Typical outputs include delimited records, export rows, logs, and product-specific text formats. The library provides the transformation mechanism; the integrating application remains responsible for the surrounding transport, protocol compliance, persistence, and delivery.
 
 ### One integration, multiple client formats

@@ -24,6 +24,7 @@ namespace ColumnWeaver.NET.Examples
             Example8_ReplaceValueHelper();
             Example9_VariableStore();
             Example10_CustomFunctionRegister();
+            Example11_ClientSpecificTradingRecords();
         }
 
         private static void Example1_BasicUsage()
@@ -529,6 +530,92 @@ namespace ColumnWeaver.NET.Examples
                 Console.WriteLine($"  {result}");
             }
             Console.WriteLine();
+        }
+
+        // ----------------------------------------------------------------
+        //  Example 11 — Client-specific trading record layouts
+        // ----------------------------------------------------------------
+
+        /// <summary>
+        /// Applies two output schemas to the same trade execution object.
+        /// This demonstrates configurable string shaping only; transport and
+        /// broker/exchange protocol compliance remain the host application's job.
+        /// </summary>
+        private static void Example11_ClientSpecificTradingRecords()
+        {
+            Console.WriteLine("11. Client-specific trading record layouts");
+            Console.WriteLine("--------------------------------------------");
+
+            var compactFormat = new ParserConfiguration
+            {
+                Name = "CompactExecution",
+                GlobalSeparator = "|",
+                Columns =
+                {
+                    new FixedTextColumn { Name = "RecordType", Text = "EXEC", Order = 1 },
+                    new PropertyColumn { Name = "Reference", PropertyPath = "ClientReference", Order = 2 },
+                    new PropertyColumn { Name = "Symbol", PropertyPath = "Symbol", Order = 3 },
+                    new ConditionalColumn
+                    {
+                        Name = "SideCode",
+                        ConditionExpression = "IsBuy == true",
+                        TrueValue = "B",
+                        FalseValue = "S",
+                        Order = 4
+                    },
+                    new PropertyColumn { Name = "Quantity", PropertyPath = "Quantity", Order = 5 },
+                    new PropertyColumn { Name = "Price", PropertyPath = "Price", Order = 6 },
+                    new FormulaColumn { Name = "Notional", Expression = "Price * Quantity", Order = 7 }
+                }
+            };
+
+            var operationsFormat = new ParserConfiguration
+            {
+                Name = "OperationsExecution",
+                GlobalSeparator = "|",
+                Columns =
+                {
+                    new FixedTextColumn { Name = "RecordType", Text = "TRADE", Order = 1 },
+                    new PropertyColumn { Name = "Account", PropertyPath = "Account", Order = 2 },
+                    new PropertyColumn { Name = "Reference", PropertyPath = "ClientReference", Order = 3 },
+                    new PropertyColumn { Name = "Symbol", PropertyPath = "Symbol", Order = 4 },
+                    new PropertyColumn { Name = "Quantity", PropertyPath = "Quantity", Order = 5 },
+                    new PropertyColumn { Name = "Price", PropertyPath = "Price", Order = 6 }
+                }
+            };
+
+            // Build reusable clients when loading the schemas, then select the
+            // destination's parser for each record in the host application.
+            var compactParser = ColumnWeaverClient.CreatePrecompiled(
+                compactFormat, typeof(TradeExecution));
+            var operationsParser = ColumnWeaverClient.CreatePrecompiled(
+                operationsFormat, typeof(TradeExecution));
+
+            var execution = new TradeExecution
+            {
+                ClientReference = "C-1042",
+                Account = "AC-77",
+                Symbol = "ABC",
+                IsBuy = true,
+                Quantity = 100,
+                Price = 25.50m
+            };
+
+            Console.WriteLine("Compact client:");
+            Console.WriteLine($"  {compactParser.Parse(execution)}");
+            Console.WriteLine("Operations client:");
+            Console.WriteLine($"  {operationsParser.Parse(execution)}");
+            Console.WriteLine("The schemas change the output layout; the source object is shared.\n");
+        }
+
+        private sealed class TradeExecution
+        {
+            public string ClientReference { get; set; }
+            public string Account { get; set; }
+            public string Symbol { get; set; }
+            public bool IsBuy { get; set; }
+            public int Quantity { get; set; }
+            public decimal Price { get; set; }
         }
     }
 }

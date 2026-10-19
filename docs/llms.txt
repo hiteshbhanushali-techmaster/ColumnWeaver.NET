@@ -25,6 +25,7 @@
 ## Evidence
 - Read `llms-full.txt` for the complete code-verified feature inventory, UI limits, license status, performance caveats, and discovery terms.
 - Read `features.md` for configuration combinations and practical client-format patterns.
+- Read `use-cases/client-specific-trading-records.md` for a worked example of applying multiple trading-record schemas to the same source object.
 - Read `../README.md` for setup, examples, architecture, and reported benchmarks.
 - Read `../BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.Benchmarks.ParserBenchmarks-report-github.md` for benchmark details. Hard-coded C# is faster in some individual scenarios; avoid universal speed claims.
 

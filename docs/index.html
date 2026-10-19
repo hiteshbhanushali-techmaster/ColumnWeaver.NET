@@ -77,7 +77,7 @@
     <div class="wrap">
       <nav aria-label="Main navigation">
         <a class="brand" href="#top"><img src="assets/columnweaver-icon.png" alt="ColumnWeaver.NET woven-columns mark"><strong>ColumnWeaver.NET</strong></a>
-        <div class="links"><a href="#why">Why ColumnWeaver</a><a href="#features">Features</a><a href="#benchmarks">Benchmarks</a><a href="#quickstart">Quick start</a><a href="#terms">Terms</a></div>
+        <div class="links"><a href="#why">Why ColumnWeaver</a><a href="#features">Features</a><a href="#use-case">Trading use case</a><a href="#benchmarks">Benchmarks</a><a href="#quickstart">Quick start</a><a href="#terms">Terms</a></div>
       </nav>
       <div id="top" class="eyebrow">One transformation engine · client-owned output formats</div>
       <h1>Give every client the format they need—without rewriting your application.</h1>
@@ -109,6 +109,12 @@
       </div>
       <p class="muted">See the <a href="features.md">complete feature and configurator reference</a> for all five column types, shared per-column controls, supported combinations, and API-only settings. The configurator currently saves/opens JSON; XML serialization is available through the library API. Preserving separator slots for disabled columns is also API-only.</p>
       <figure class="configurator-demo"><img src="assets/configurator-demo.gif" alt="ColumnWeaver.NET configurator editing a formula and variables, then parsing sample JSON to preview the formatted row" loading="lazy"><figcaption>Configurator workflow: edit a formula, set its variables, and preview the resulting row from sample JSON.</figcaption></figure>
+    </section>
+    <section id="use-case">
+      <div class="eyebrow">A concrete integration pattern</div><h2>One trade record, different client layouts</h2>
+      <p class="lead">A trading application can reuse the same execution object while each destination selects its own fields, order, labels, conditions, and calculations. The host selects a precompiled schema for the destination; ColumnWeaver.NET formats the object into a string.</p>
+      <p>See the <a href="use-cases/client-specific-trading-records.md">worked client-specific trading record example</a> for two schemas applied to the same record, installation instructions, and production validation boundaries.</p>
+      <p class="note">The guide is illustrative. ColumnWeaver.NET returns formatted strings; the application must implement and validate any broker, exchange, FIX, drop-copy, framing, escaping, and delivery requirements.</p>
     </section>
     <section id="benchmarks">
       <div class="eyebrow">Measured, not promised</div><h2>Performance depends on the schema</h2>

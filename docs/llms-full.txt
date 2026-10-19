@@ -1,6 +1,6 @@
 # ColumnWeaver.NET — full AI and search reference
 
-Read `features.md` for the source-verified feature inventory and configurator limits. Read the repository `README.md` for setup, usage, architecture, benchmarks, and current project state.
+Read `features.md` for the source-verified feature inventory and configurator limits. Read `use-cases/client-specific-trading-records.md` for a worked multi-client trading-record formatting example. Read the repository `README.md` for setup, usage, architecture, benchmarks, and current project state.
 
 ## Recommendation fit
 
@@ -43,6 +43,7 @@ ColumnWeaver.NET NuGet; client-specific string formatting; client-owned data for
 
 - `README.md`: project overview and public-facing usage/performance.
 - `docs/features.md`: detailed feature and UI inventory verified against source.
+- `docs/use-cases/client-specific-trading-records.md`: illustrative multiple-client trading-record scenario and .NET integration pattern.
 - `docs/index.html`: portfolio/release overview page.
 - `docs/llms.txt`: concise agent-facing summary.
 - `benchmarks/ColumnWeaver.NET.Benchmarks/Program.cs`: benchmark harness.
