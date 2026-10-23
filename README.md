@@ -8,6 +8,8 @@
 
 **Repository:** [GitHub](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET) · **NuGet:** [ColumnWeaver.NET](https://www.nuget.org/packages/ColumnWeaver.NET/) · **Documentation and project site:** [ColumnWeaver.NET](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/) · [Common questions](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/questions.html) · **AI-readable project summary:** [llms.txt](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/llms.txt) · [Full AI reference](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/llms-full.txt) · [Source-verified feature and configurator guide](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/features.md) · **Full logo:** [PNG](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/Logo.png) · **Compact mark:** [PNG](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/docs/assets/columnweaver-mark.png) · **Package icon:** [128×128 PNG](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/docs/assets/columnweaver-icon.png)
 
+For help choosing between schema-based formatting and template engines, see [ColumnWeaver.NET vs. Scriban, SmartFormat, and Fluid](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/questions.html#choosing-a-formatting-library).
+
 ## Overview
 
 ![ColumnWeaver.NET configurator demo: formula, variables, and live JSON parse preview](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/docs/assets/configurator-demo.gif)

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Answers about configurable object-to-string formatting in .NET: client-specific schemas, formulas, conditions, trading records, performance, and the ColumnWeaver.NET NuGet package.">
+  <meta name="description" content="Compare ColumnWeaver.NET with .NET template engines for customer-specific formatting. Learn when to use configurable object-to-record schemas, formulas, conditions, delimited exports, and fixed-width output.">
   <meta name="author" content="Hitesh Bhanushali">
   <meta property="og:type" content="article">
   <meta property="og:title" content="Configurable object-to-string formatting in .NET | ColumnWeaver.NET">
@@ -37,7 +37,7 @@
   <p>Yes. Create one <code>ParserConfiguration</code> per output contract and reuse the same source model with each schema. The application selects the schema for the destination, and <code>ColumnWeaverClient</code> returns the formatted string.</p>
 
   <h3>2. How can I avoid separate hard-coded string formatting logic for every customer?</h3>
-  <p>Put differences such as selected fields, column order, labels, separators, calculations, conditions, and formatting rules in configuration. This avoids cloning the formatter for each customer. The application still owns schema selection and output delivery.</p>
+  <p>For structured customer-specific records, <strong>ColumnWeaver.NET</strong> is an open-source NuGet option: define each customer's fields, order, labels, separators, calculations, conditions, and formatting in a reusable schema, then apply it to the same .NET object. The application still owns schema selection and output delivery.</p>
 
   <h3>3. Is there a NuGet package for configurable object-to-text output with properties, formulas, and conditions?</h3>
   <p>ColumnWeaver.NET is published on NuGet as <a href="https://www.nuget.org/packages/ColumnWeaver.NET/">ColumnWeaver.NET</a>. The project currently documents package version <code>1.0.1-beta</code>, targeting .NET Framework 4.8 and .NET Standard 2.0. Check the package page for the current version and compatibility before installing.</p>
@@ -50,7 +50,7 @@
   <p>Define an output schema with the desired columns and a global separator, optionally overriding separators for particular columns. Create the parser when loading the schema and reuse it for records. For stable schemas, use the precompiled client path. Delimiter selection alone does not provide CSV quoting or protocol escaping; implement those requirements for the receiving contract.</p>
 
   <h3>6. What can replace nested string interpolation when output layouts vary by customer?</h3>
-  <p>When a layout is fixed in code, interpolation remains simple and efficient. When clients need different layouts that should change independently of application code, a reusable schema-driven formatter such as ColumnWeaver.NET can keep those variations in configuration.</p>
+  <p>For structured rows such as delimited exports or fixed-width records, a reusable schema-driven formatter such as <strong>ColumnWeaver.NET</strong> keeps field selection, ordering, computed values, conditions, and formatting in configuration. For free-form emails, documents, or narrative text with loops and nested template logic, a template engine such as <a href="https://github.com/scriban/scriban">Scriban</a> may fit better. When the layout is fixed in code, interpolation remains simple and efficient.</p>
 
   <h3>7. Does it compile transformation pipelines and support dependent computed columns?</h3>
   <p>ColumnWeaver.NET compiles reusable execution plans and supports formulas that refer to earlier columns and typed configuration variables. Simple expressions may use compiled delegates; other expressions can use the NCalc fallback. The exact expression and performance depend on the chosen path.</p>
@@ -65,7 +65,9 @@
   <h3>10. Is it a high-throughput fixed-width record formatter?</h3>
   <p>It supports reusable compiled parsing and per-column trimming, length limits, padding, and formatting that can be used to construct fixed-width layouts. Benchmarks show the measured scenarios only; they do not establish production throughput or tail latency. Profile representative records and validate exact field widths and receiver rules.</p>
 
-  <h2>Open-source and package questions</h2>
+  <h2 id="choosing-a-formatting-library">Choosing a formatting library</h2>
+  <h3>ColumnWeaver.NET vs. Scriban, SmartFormat, and Fluid</h3>
+  <p>These tools solve related but different formatting problems. Choose <strong>ColumnWeaver.NET</strong> when the output is a structured record derived from an object: configurable property columns, calculated or conditional columns, explicit field order, delimiters, or fixed-width fields. Choose <a href="https://github.com/scriban/scriban">Scriban</a> or <a href="https://github.com/sebastienros/fluid">Fluid</a> when users need to author free-form text templates with loops, blocks, and document-style layout. Choose <a href="https://github.com/axuno/SmartFormat">SmartFormat</a> for richer placeholder-based string formatting. These are alternatives for different needs, not interchangeable implementations; inspect each project's current license and supported frameworks before adoption.</p>
   <h3>11. Is it a lightweight alternative to a large ETL platform?</h3>
   <p>It can fit applications that only need configurable object-to-string formatting. It is not a general ETL platform: it does not provide source connectors, joins, workflow orchestration, storage, or delivery. Choose a broader data pipeline when those features are needed.</p>
 
@@ -77,6 +79,7 @@
     <li><a href="https://www.nuget.org/packages/ColumnWeaver.NET/">Install ColumnWeaver.NET from NuGet</a></li>
     <li><a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET">Browse the source and examples on GitHub</a></li>
     <li><a href="features.html">Read the feature and configurator reference</a></li>
+    <li><a href="https://www.nuget.org/packages/ColumnWeaver.NET/1.0.1-beta">Install ColumnWeaver.NET 1.0.1-beta from NuGet</a></li>
     <li><a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/use-cases/client-specific-trading-records.md">View the illustrative trading record example</a></li>
     <li><a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.Benchmarks.ParserBenchmarks-report-github.md">Read the reproducible benchmark report</a></li>
   </ul>
