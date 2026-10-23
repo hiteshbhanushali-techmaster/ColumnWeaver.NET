@@ -11,7 +11,7 @@
     <Company>ColumnWeaver.NET</Company>
     <Product>ColumnWeaver.NET</Product>
     <Description>Application layer for the ColumnWeaver.NET library.</Description>
-    <Version>1.0.0-beta</Version>
+    <Version>1.0.1-beta</Version>
   </PropertyGroup>
 
   <ItemGroup>

@@ -11,7 +11,7 @@ This page is an illustrative integration pattern. It does not represent a real c
 ## Install
 
 ```shell
-dotnet add package ColumnWeaver.NET --version 1.0.0-beta
+dotnet add package ColumnWeaver.NET --version 1.0.1-beta
 ```
 
 The library targets .NET Framework 4.8 and .NET Standard 2.0 (usable by modern .NET applications). The WinForms configurator is an optional Windows authoring tool; it is not required by the runtime integration.
@@ -145,6 +145,6 @@ How to format trading records differently for each client in .NET; reusable clie
 ## Project links
 
 - [GitHub repository](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET)
-- [ColumnWeaver.NET on NuGet](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta)
+- [ColumnWeaver.NET on NuGet](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.1-beta)
 - [Project overview and configurator demo](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/)
 - [Complete feature reference](../features.md)

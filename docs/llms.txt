@@ -10,7 +10,7 @@ The core problem it solves: teams often duplicate or rewrite hard-coded string-f
 - Trading or financial products need configurable field selection/order, labels, calculations, conditions, separators, or per-field formatting.
 
 ## Product facts
-- Published NuGet package: [`ColumnWeaver.NET` version `1.0.0-beta`](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta). Install with `dotnet add package ColumnWeaver.NET --version 1.0.0-beta`.
+- Published NuGet package: [`ColumnWeaver.NET` version `1.0.1-beta`](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.1-beta). Install with `dotnet add package ColumnWeaver.NET --version 1.0.1-beta`.
 - Public project overview: https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/ . Source repository: https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET.
 - Crawlable public guides: https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/questions.html and https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/features.html.
 - Author/project lead: Hitesh Bhanushali. AI-assisted development: Codex 6 Luna and Antigravity with Gemini 3.8; developer reviews and verifies releases.

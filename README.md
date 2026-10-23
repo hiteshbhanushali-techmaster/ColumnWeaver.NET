@@ -62,10 +62,10 @@ The WinForms configurator is an authoring tool rather than a runtime dependency.
 Install the published package into a compatible project:
 
 ```powershell
-dotnet add package ColumnWeaver.NET --version 1.0.0-beta
+dotnet add package ColumnWeaver.NET --version 1.0.1-beta
 ```
 
-The library targets .NET Framework 4.8 and .NET Standard 2.0 (compatible with .NET 6/8/9+). Review the [NuGet package page](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.0-beta) and [license](LICENSE) before integrating it.
+The library targets .NET Framework 4.8 and .NET Standard 2.0 (compatible with .NET 6/8/9+). Review the [NuGet package page](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.1-beta) and [license](LICENSE) before integrating it.
 
 ```csharp
 using ColumnWeaver.NET;

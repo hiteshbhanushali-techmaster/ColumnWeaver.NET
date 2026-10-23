@@ -39,4 +39,4 @@ jobs:
       - name: Publish package
         env:
           NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
-        run: dotnet nuget push "artifacts/ColumnWeaver.NET.1.0.0-beta.nupkg" --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push "artifacts/ColumnWeaver.NET.1.0.1-beta.nupkg" --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json

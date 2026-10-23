@@ -12,8 +12,8 @@
     <Product>ColumnWeaver.NET</Product>
     <Description>Client-specific object-to-string formatting for .NET Framework 4.8 and .NET Standard 2.0 (compatible with modern .NET 6/8/9+). Reuse one transformation engine across products and customers with configurable columns, formulas, conditions, variables, separators, fixed-width output, null rules, replacements, JSON/XML schemas, and streaming batches.</Description>
     <PackageTitle>ColumnWeaver.NET</PackageTitle>
-    <Version>1.0.0-beta</Version>
-    <PackageVersion>1.0.0-beta</PackageVersion>
+    <Version>1.0.1-beta</Version>
+    <PackageVersion>1.0.1-beta</PackageVersion>
     <Authors>Hitesh Bhanushali</Authors>
     <PackageProjectUrl>https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET</RepositoryUrl>
