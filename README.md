@@ -163,7 +163,7 @@ var client = ColumnWeaverClient.CreatePrecompiled(config, typeof(BenchmarkOrder)
 var client = ColumnWeaverClient.Create(config);
 client.Freeze();
 ```
-- **Bypasses Fingerprinting:** Reuses the compiled specialized row delegate directly, eliminating per-record configuration scanning and cache lookups. Steady-state parse latency drops to **~113 ns**.
+- **Bypasses Fingerprinting:** Reuses the compiled specialized row delegate directly, eliminating per-record configuration scanning and cache lookups. Steady-state parse latency drops to **~107 ns**.
 - **Explicit Recompilation:** When frozen, callers who intentionally modify their configuration can call `client.Recompile()` to rebuild the plan, or call `config.Snapshot()` to decouple independent configuration instances.
 
 ### 3. Safe, Single-Pass Streaming (`ParseMany`)
@@ -203,47 +203,47 @@ All implementations use identical input objects and are asserted in setup to pro
 
 | Feature Scenario | Implementation / Engine | Mean Latency | Error | StdDev | Gen0 / 1k Ops | Allocated / Op |
 |:---|:---|---:|---:|---:|---:|---:|
-| **1. Property Extraction**<br>*(Flat `Id` + nested `Customer.Name`, `City`)* | Hard-coded C# | 93.66 ns | 3.79 ns | 1.35 ns | 0.0395 | 249 B |
-| | **Compiled Client** | **111.61 ns** | **3.42 ns** | **1.22 ns** | **0.0126** | **80 B** |
-| | NCalc / Interpreted | 5,689.79 ns | 128.37 ns | 45.78 ns | 0.9460 | 5,978 B |
-| **2. Formula Calculations**<br>*(Arithmetic `UnitPrice * Quantity` + "F2")* | Hard-coded C# | 224.52 ns | 8.56 ns | 3.05 ns | 0.0062 | 40 B |
-| | **Compiled Client** | **286.64 ns** | **7.82 ns** | **2.79 ns** | **0.0124** | **80 B** |
-| | NCalc / Interpreted | 20,095.66 ns | 953.71 ns | 340.10 ns | 1.1597 | 7,463 B |
-| **3. Conditional Columns**<br>*(Full row: `Id` + boolean status branch)* | *Hard-coded C# (Micro)* | *0.77 ns* | *0.04 ns* | *0.01 ns* | - | - |
-| | Hard-coded C# (Full Row) | 49.14 ns | 2.38 ns | 0.85 ns | 0.0134 | 84 B |
-| | **Compiled Client (Full Row)** | **73.30 ns** | **2.76 ns** | **0.99 ns** | **0.0082** | **52 B** |
-| | NCalc / Interpreted | 21,098.10 ns | 704.05 ns | 251.07 ns | 1.1902 | 7,581 B |
-| **4. Variables (Numeric & String)**<br>*(Formula with `${TaxRate}` + Condition with `${Currency}`)* | Hard-coded C# | 244.14 ns | 9.53 ns | 2.47 ns | 0.0162 | 104 B |
-| | **Compiled Client** | **304.85 ns** | **7.26 ns** | **2.59 ns** | **0.0162** | **104 B** |
-| | NCalc / Interpreted | 45,489.07 ns | 1,887.41 ns | 490.15 ns | 2.3804 | 15,117 B |
-| **5. Fixed Text / Labels**<br>*(Constant labels prepended & appended)* | Hard-coded C# | 48.07 ns | 2.21 ns | 0.79 ns | 0.0153 | 96 B |
-| | **Compiled Client** | **80.93 ns** | **1.50 ns** | **0.53 ns** | **0.0088** | **56 B** |
-| | NCalc / Interpreted | 3,603.08 ns | 193.74 ns | 69.09 ns | 0.7095 | 4,469 B |
-| **6. Custom Functions**<br>*(Function registry delegate invocation `Upper`)* | Hard-coded C# | 71.07 ns | 2.77 ns | 0.99 ns | 0.0191 | 120 B |
-| | **Compiled Client** | **181.58 ns** | **8.35 ns** | **2.98 ns** | **0.0241** | **152 B** |
-| | NCalc / Interpreted | 7,735.21 ns | 359.17 ns | 128.08 ns | 1.1749 | 7,438 B |
-| **7. Null Handling**<br>*(Full row: `Id` + fallback `Notes ?? "(none)"`)* | *Hard-coded C# (Micro)* | *0.77 ns* | *0.07 ns* | *0.02 ns* | - | - |
-| | Hard-coded C# (Full Row) | 49.17 ns | 1.99 ns | 0.71 ns | 0.0137 | 86 B |
-| | **Compiled Client (Full Row)** | **71.28 ns** | **0.99 ns** | **0.35 ns** | **0.0086** | **54 B** |
-| | NCalc / Interpreted | 4,050.12 ns | 157.01 ns | 55.99 ns | 0.7706 | 4,868 B |
-| **8. Formatting Options**<br>*(TrimBoth, UpperCase, PadRight, Prefix, Suffix)* | Hard-coded C# | 115.02 ns | 4.47 ns | 1.59 ns | 0.0331 | 209 B |
-| | **Compiled Client** | **219.66 ns** | **3.70 ns** | **1.32 ns** | **0.0508** | **321 B** |
-| | NCalc / Interpreted | 2,888.13 ns | 311.50 ns | 111.08 ns | 0.6599 | 4,164 B |
-| **9. Replacement Rules**<br>*(Sequential string substitution rules)* | Hard-coded C# | 39.45 ns | 2.33 ns | 0.83 ns | 0.0102 | 64 B |
-| | **Compiled Client** | **324.06 ns** | **16.89 ns** | **6.02 ns** | **0.0558** | **353 B** |
-| | NCalc / Interpreted | 3,009.55 ns | 326.27 ns | 116.35 ns | 0.6828 | 4,301 B |
-| **10. Disabled Column Slot**<br>*(`PreserveSeparatorForDisabledColumns = true`)* | Hard-coded C# | 50.20 ns | 1.82 ns | 0.65 ns | 0.0153 | 96 B |
-| | **Compiled Client** | **75.90 ns** | **6.35 ns** | **2.27 ns** | **0.0088** | **56 B** |
-| | NCalc / Interpreted | 4,649.95 ns | 640.26 ns | 228.32 ns | 0.7782 | 4,910 B |
-| **11. Dependency-Heavy Formulas**<br>*(5 chained formulas + conditional tier)* | Hard-coded C# | 1,336.12 ns | 85.18 ns | 30.38 ns | 0.0839 | 530 B |
-| | **Compiled Client** | **1,379.05 ns** | **211.58 ns** | **75.45 ns** | **0.0477** | **305 B** |
-| | NCalc / Interpreted | 115,883.77 ns | 3,620.16 ns | 940.14 ns | 5.3711 | 34,046 B |
-| **12. Batch 10k Items**<br>*(Representative schema across 10,000 items)* | Hard-coded C# | 8,677,470.83 ns | 608,810.71 ns | 217,107.76 ns | 734.3750 | 4,648,404 B |
-| | **Compiled Client (`ParseMany`)** | **9,095,104.69 ns** | **596,430.94 ns** | **212,693.02 ns** | **312.5000** | **2,001,312 B** |
-| | NCalc / Interpreted | 760,449,133.33 ns | 53,479,700.09 ns | 19,071,376.22 ns | 37000.0000 | 235,795,608 B |
-| **13. Lifecycle: Cold Start vs Steady State** | Cold Start (Clone & Compile & Parse) | 587,690.04 ns | 29,419.52 ns | 10,491.28 ns | 7.8125 | 53,342 B |
-| | **Steady State (Precompiled Parse)** | **113.46 ns** | **3.99 ns** | **1.42 ns** | **0.0126** | **80 B** |
-| **14. Configuration Validation** | Representative Config Validation | 17,246.09 ns | 338.06 ns | 87.79 ns | 2.5940 | 16,432 B |
+| **1. Property Extraction**<br>*(Flat `Id` + nested `Customer.Name`, `City`)* | Hard-coded C# | 95.68 ns | 8.49 ns | 2.20 ns | 0.0395 | 249 B |
+| | **Compiled Client** | **110.41 ns** | **2.47 ns** | **0.64 ns** | **0.0126** | **80 B** |
+| | NCalc / Interpreted | 5,816.63 ns | 173.40 ns | 61.84 ns | 0.9460 | 5,978 B |
+| **2. Formula Calculations**<br>*(Arithmetic `UnitPrice * Quantity` + "F2")* | Hard-coded C# | 219.50 ns | 2.26 ns | 0.59 ns | 0.0062 | 40 B |
+| | **Compiled Client** | **281.46 ns** | **5.07 ns** | **1.81 ns** | **0.0124** | **80 B** |
+| | NCalc / Interpreted | 7,616.83 ns | 121.44 ns | 43.31 ns | 1.3733 | 8,665 B |
+| **3. Conditional Columns**<br>*(Full row: `Id` + boolean status branch)* | *Hard-coded C# (Micro)* | *0.70 ns* | *0.02 ns* | *0.01 ns* | - | - |
+| | Hard-coded C# (Full Row) | 47.56 ns | 0.71 ns | 0.25 ns | 0.0134 | 84 B |
+| | **Compiled Client (Full Row)** | **71.68 ns** | **1.21 ns** | **0.32 ns** | **0.0082** | **52 B** |
+| | NCalc / Interpreted | 8,252.35 ns | 273.94 ns | 71.14 ns | 1.3733 | 8,702 B |
+| **4. Variables (Numeric & String)**<br>*(Formula with `${TaxRate}` + Condition with `${Currency}`)* | Hard-coded C# | 238.19 ns | 13.75 ns | 4.90 ns | 0.0162 | 104 B |
+| | **Compiled Client** | **301.39 ns** | **8.89 ns** | **3.17 ns** | **0.0162** | **104 B** |
+| | NCalc / Interpreted | 19,749.90 ns | 339.21 ns | 88.09 ns | 2.7466 | 17,403 B |
+| **5. Fixed Text / Labels**<br>*(Constant labels prepended & appended)* | Hard-coded C# | 47.59 ns | 0.62 ns | 0.22 ns | 0.0153 | 96 B |
+| | **Compiled Client** | **80.07 ns** | **0.75 ns** | **0.20 ns** | **0.0088** | **56 B** |
+| | NCalc / Interpreted | 3,640.71 ns | 142.97 ns | 37.13 ns | 0.7095 | 4,469 B |
+| **6. Custom Functions**<br>*(Function registry delegate invocation `Upper`)* | Hard-coded C# | 72.16 ns | 1.11 ns | 0.29 ns | 0.0191 | 120 B |
+| | **Compiled Client** | **189.57 ns** | **15.27 ns** | **5.45 ns** | **0.0241** | **152 B** |
+| | NCalc / Interpreted | 8,183.72 ns | 303.60 ns | 78.84 ns | 1.1749 | 7,438 B |
+| **7. Null Handling**<br>*(Full row: `Id` + fallback `Notes ?? "(none)"`)* | *Hard-coded C# (Micro)* | *0.72 ns* | *0.11 ns* | *0.04 ns* | - | - |
+| | Hard-coded C# (Full Row) | 47.88 ns | 0.39 ns | 0.10 ns | 0.0137 | 86 B |
+| | **Compiled Client (Full Row)** | **70.02 ns** | **2.52 ns** | **0.90 ns** | **0.0086** | **54 B** |
+| | NCalc / Interpreted | 4,000.49 ns | 150.80 ns | 53.78 ns | 0.7706 | 4,868 B |
+| **8. Formatting Options**<br>*(TrimBoth, UpperCase, PadRight, Prefix, Suffix)* | Hard-coded C# | 114.22 ns | 3.12 ns | 0.81 ns | 0.0331 | 209 B |
+| | **Compiled Client** | **208.28 ns** | **5.21 ns** | **1.86 ns** | **0.0508** | **321 B** |
+| | NCalc / Interpreted | 2,616.34 ns | 46.17 ns | 11.99 ns | 0.6599 | 4,164 B |
+| **9. Replacement Rules**<br>*(Sequential string substitution rules)* | Hard-coded C# | 37.92 ns | 1.52 ns | 0.54 ns | 0.0102 | 64 B |
+| | **Compiled Client** | **316.18 ns** | **18.94 ns** | **6.75 ns** | **0.0558** | **353 B** |
+| | NCalc / Interpreted | 2,781.71 ns | 113.08 ns | 29.37 ns | 0.6828 | 4,301 B |
+| **10. Disabled Column Slot**<br>*(`PreserveSeparatorForDisabledColumns = true`)* | Hard-coded C# | 47.28 ns | 2.18 ns | 0.78 ns | 0.0153 | 96 B |
+| | **Compiled Client** | **73.92 ns** | **2.27 ns** | **0.81 ns** | **0.0088** | **56 B** |
+| | NCalc / Interpreted | 4,047.77 ns | 215.69 ns | 76.92 ns | 0.7782 | 4,910 B |
+| **11. Dependency-Heavy Formulas**<br>*(5 chained formulas + conditional tier)* | Hard-coded C# | 1,260.50 ns | 32.36 ns | 11.54 ns | 0.0839 | 530 B |
+| | **Compiled Client** | **1,275.45 ns** | **4.31 ns** | **1.54 ns** | **0.0477** | **305 B** |
+| | NCalc / Interpreted | 42,913.16 ns | 581.37 ns | 207.32 ns | 6.4697 | 40,816 B |
+| **12. Batch 10k Items**<br>*(Representative schema across 10,000 items)* | Hard-coded C# | 8,131,809.38 ns | 321,481.28 ns | 114,643.32 ns | 734.3750 | 4,648,404 B |
+| | **Compiled Client (`ParseMany`)** | **8,491,350.00 ns** | **485,184.22 ns** | **173,021.37 ns** | **312.5000** | **2,001,312 B** |
+| | NCalc / Interpreted | 321,509,900.00 ns | 11,451,800.55 ns | 4,083,822.39 ns | 42500.0000 | 269,831,116 B |
+| **13. Lifecycle: Cold Start vs Steady State** | Cold Start (Clone & Compile & Parse) | 563,945.69 ns | 10,377.62 ns | 3,700.76 ns | 7.8125 | 53,363 B |
+| | **Steady State (Precompiled Parse)** | **107.45 ns** | **2.63 ns** | **0.94 ns** | **0.0126** | **80 B** |
+| **14. Configuration Validation** | Representative Config Validation | 16,763.29 ns | 901.18 ns | 321.37 ns | 2.5940 | 16,432 B |
 
 ### Performance Analysis & Trade-offs
 
@@ -253,19 +253,19 @@ All implementations use identical input objects and are asserted in setup to pro
   - Statically compilable pipelines (Property, Formula, Conditional, FixedText, Variables) compile into a single specialized row delegate (`Func<object?, StringBuilder, string>`).
   - Eliminates per-node virtual dispatch, array clearing, value-type boxing, and per-column string allocations on the steady-state hot path.
   - Zero-allocation integer and long formatting is implemented via thread-static char buffers, bypassing .NET Framework 4.8's heap-allocating `StringBuilder.Append(int)` implementation.
-  - Property extraction executes in **~111.6 ns** (down from 311.1 ns), with only **80 B** allocation (68% lower allocation than hard-coded C#'s 249 B).
-  - Formula calculations execute in **~286.6 ns** (down from 369.8 ns; uncompiled NCalc takes ~20,096 ns — a **70x speedup**).
-  - Conditionals evaluate full rows in **~73.3 ns** (allocating 52 B vs 84 B for hard-coded C#; uncompiled NCalc takes ~21,098 ns — a **287x speedup**).
-  - Variables achieve **304.8 ns** (down from 641.6 ns; 2.1x speedup) with exact allocation parity to hard-coded C# (104 B).
-  - Dependency-heavy chained formulas execute in **~1,379 ns** vs **~1,336 ns** (**1.032x latency ratio, only 3.2% overhead**) while allocating **42% less memory than hard-coded C#** (305 B vs 530 B).
-- **Batch Processing Throughput & 4.8% Overhead:**
-  - **Batch Latency:** `ParseMany` processes 10,000 items in **9.10 ms** compared to **8.68 ms** for equivalent hard-coded C#. This achieves a **1.048x latency ratio (4.8% overhead)**, handily beating the **≤13% overhead stretch target**.
+  - Property extraction executes in **~110.4 ns** (down from 311.1 ns), with only **80 B** allocation (68% lower allocation than hard-coded C#'s 249 B).
+  - Formula calculations execute in **~281.5 ns** (down from 369.8 ns; uncompiled NCalc takes ~7,617 ns — a **27x speedup**).
+  - Conditionals evaluate full rows in **~71.7 ns** (allocating 52 B vs 84 B for hard-coded C#; uncompiled NCalc takes ~8,252 ns — a **115x speedup**).
+  - Variables achieve **301.4 ns** (down from 641.6 ns; 2.1x speedup) with exact allocation parity to hard-coded C# (104 B).
+  - Dependency-heavy chained formulas execute in **~1,275 ns** vs **~1,260 ns** (**1.012x latency ratio, only 1.2% overhead**) while allocating **42% less memory than hard-coded C#** (305 B vs 530 B).
+- **Batch Processing Throughput & 4.4% Overhead:**
+  - **Batch Latency:** `ParseMany` processes 10,000 items in **8.49 ms** compared to **8.13 ms** for equivalent hard-coded C#. This achieves a **1.044x latency ratio (4.4% overhead)**, handily beating the **≤13% overhead stretch target**.
   - **Batch Memory Efficiency:** `ParseMany` allocates only **2.00 MB** across 10,000 items compared to **4.65 MB** for equivalent hard-coded C# (**57% lower memory footprint**) because it streams output rows through a reused string builder rather than performing intermediate string concatenations.
-  - Compared with interpreted NCalc batch processing (760.4 ms and 235.8 MB), ColumnWeaver compiled batching is **83.6x faster** and allocates **99.1% less memory**.
+  - Compared with interpreted NCalc batch processing (321.5 ms and 269.8 MB), ColumnWeaver compiled batching is **37.9x faster** and allocates **99.3% less memory**.
 - **Throughput Realities:**
-  - In steady-state single-record parsing (`Parse`), precompiled execution takes **~113.5 ns per record** (down from 315 ns) allocating only 80 bytes.
-  - In batch parsing (`ParseMany`), throughput exceeds **1,099,000 records/sec per core** (~0.91 µs per record).
-  - Cold-start execution plan compilation takes **~588 µs** once per schema.
+  - In steady-state single-record parsing (`Parse`), precompiled execution takes **~107.5 ns per record** (down from 315 ns) allocating only 80 bytes.
+  - In batch parsing (`ParseMany`), throughput exceeds **1,177,000 records/sec per core** (~0.85 µs per record).
+  - Cold-start execution plan compilation takes **~564 µs** once per schema.
   - Standard mutable clients compute an allocation-free FNV-1a fingerprint from configuration content when retrieving a plan. This work grows with configuration size; the precompiled/frozen path avoids the per-record configuration scan for stable schemas. FNV-1a is non-cryptographic and has a theoretical collision risk.
 - **Limitations:** The suite benchmarks representative features and scenarios. Throughput in production will vary with complex object graphs, deep reflection hierarchies, and external garbage collection load.
 

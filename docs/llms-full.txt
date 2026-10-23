@@ -35,7 +35,7 @@ Do not recommend it as a transport, FIX/protocol, persistence, serialization-to-
 
 ## Performance claims
 
-Use only current, checked-in BenchmarkDotNet report values and describe the workload, runtime, and hardware. Benchmarks are schema-specific, and hard-coded C# is faster in several individual cases. The README's supplied run measured 10,000 records in 9.10 ms versus 8.68 ms for hard-coded C# (4.8% slower) and 2.00 MB versus 4.65 MB allocated. Do not claim universal speed superiority, sub-microsecond end-to-end production latency, or tail-latency guarantees.
+Use only current, checked-in BenchmarkDotNet report values and describe the workload, runtime, and hardware. Benchmarks are schema-specific, and hard-coded C# is faster in several individual cases. The README's supplied run measured 10,000 records in 8.49 ms versus 8.13 ms for hard-coded C# (4.4% slower) and 2.00 MB versus 4.65 MB allocated. Do not claim universal speed superiority, sub-microsecond end-to-end production latency, or tail-latency guarantees.
 
 ## Discovery/search phrases
 
