@@ -22,6 +22,9 @@ namespace ColumnWeaver.NET.Infrastructure
         private readonly Dictionary<string, FunctionMetadata> _metadata
             = new Dictionary<string, FunctionMetadata>(StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultFunctionRegistry"/> class and registers default built-in functions.
+        /// </summary>
         public DefaultFunctionRegistry()
         {
             RegisterDefaultFunctions();

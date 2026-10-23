@@ -30,28 +30,61 @@ namespace ColumnWeaver.NET.Application.Execution
         private readonly Dictionary<int, Type> _nodeTypes;
         private readonly List<ValidationError> _typeErrors;
 
+        /// <summary>
+        /// Gets the dictionary mapping column indexes to their inferred CLR types.
+        /// </summary>
         public IReadOnlyDictionary<int, Type> NodeTypes => _nodeTypes;
+
+        /// <summary>
+        /// Gets the list of type validation errors collected during type analysis.
+        /// </summary>
         public IReadOnlyList<ValidationError> TypeErrors => _typeErrors;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TypeGraph"/> class.
+        /// </summary>
         public TypeGraph()
         {
             _nodeTypes  = new Dictionary<int, Type>();
             _typeErrors = new List<ValidationError>();
         }
 
+        /// <summary>
+        /// Sets the inferred CLR type for the specified column index.
+        /// </summary>
+        /// <param name="columnIndex">The zero-based column index.</param>
+        /// <param name="type">The inferred CLR type.</param>
         public void SetNodeType(int columnIndex, Type type)
         {
             _nodeTypes[columnIndex] = type ?? typeof(object);
         }
 
+        /// <summary>
+        /// Gets the inferred CLR type for the specified column index.
+        /// </summary>
+        /// <param name="columnIndex">The zero-based column index.</param>
+        /// <returns>The inferred CLR type, or <see cref="object"/> if unrecorded.</returns>
         public Type GetNodeType(int columnIndex)
             => _nodeTypes.TryGetValue(columnIndex, out var t) ? t : typeof(object);
 
+        /// <summary>
+        /// Adds a type validation error to the graph.
+        /// </summary>
+        /// <param name="columnName">The column display name.</param>
+        /// <param name="code">The validation error code.</param>
+        /// <param name="message">The validation error message.</param>
         public void AddTypeError(string columnName, string code, string message)
         {
             _typeErrors.Add(ValidationError.Error(columnName, code, message));
         }
 
+        /// <summary>
+        /// Validates that both operands of an arithmetic operator are numeric types.
+        /// </summary>
+        /// <param name="columnName">The column display name.</param>
+        /// <param name="left">The left operand type.</param>
+        /// <param name="right">The right operand type.</param>
+        /// <param name="op">The operator symbol.</param>
         public void ValidateArithmetic(string columnName, Type left, Type right, string op)
         {
             if (!IsNumeric(left) && left != typeof(object))
@@ -63,6 +96,13 @@ namespace ColumnWeaver.NET.Application.Execution
                     $"Right operand of '{op}' has non-numeric type '{GetTypeName(right)}'.");
         }
 
+        /// <summary>
+        /// Validates that the arguments supplied to a function call match its expected parameter types.
+        /// </summary>
+        /// <param name="columnName">The column display name.</param>
+        /// <param name="funcName">The function name.</param>
+        /// <param name="paramTypes">The supplied argument types.</param>
+        /// <param name="expectedTypes">The expected parameter types.</param>
         public void ValidateFunctionCall(
             string                    columnName,
             string                    funcName,
@@ -85,6 +125,12 @@ namespace ColumnWeaver.NET.Application.Execution
             }
         }
 
+        /// <summary>
+        /// Validates that conditional branches produce compatible CLR types.
+        /// </summary>
+        /// <param name="columnName">The column display name.</param>
+        /// <param name="trueType">The type produced by the true branch.</param>
+        /// <param name="falseType">The type produced by the false branch.</param>
         public void ValidateConditionalBranches(string columnName, Type trueType, Type falseType)
         {
             if (trueType == typeof(object) || falseType == typeof(object))
@@ -97,11 +143,22 @@ namespace ColumnWeaver.NET.Application.Execution
                     "Result will be 'object' at runtime.");
         }
 
+        /// <summary>
+        /// Validates comparison operand types.
+        /// </summary>
+        /// <param name="columnName">The column display name.</param>
+        /// <param name="left">The left operand type.</param>
+        /// <param name="right">The right operand type.</param>
         public void ValidateComparison(string columnName, Type left, Type right)
         {
             if (left == typeof(object) || right == typeof(object)) return;
         }
 
+        /// <summary>
+        /// Determines whether the specified CLR type is a supported numeric primitive.
+        /// </summary>
+        /// <param name="t">The type to test.</param>
+        /// <returns><c>true</c> if numeric; otherwise, <c>false</c>.</returns>
         public static bool IsNumeric(Type t)
         {
             return t == typeof(int) || t == typeof(long) || t == typeof(double) ||
@@ -110,6 +167,12 @@ namespace ColumnWeaver.NET.Application.Execution
                    t == typeof(ushort) || t == typeof(sbyte) || t == typeof(decimal);
         }
 
+        /// <summary>
+        /// Determines whether a value of the actual type is assignable or convertible to the expected type.
+        /// </summary>
+        /// <param name="actual">The actual source type.</param>
+        /// <param name="expected">The expected target type.</param>
+        /// <returns><c>true</c> if assignable or convertible; otherwise, <c>false</c>.</returns>
         public static bool IsAssignableTo(Type actual, Type expected)
         {
             if (actual == expected) return true;
@@ -120,6 +183,11 @@ namespace ColumnWeaver.NET.Application.Execution
             catch { return false; }
         }
 
+        /// <summary>
+        /// Returns a friendly display name for common CLR types.
+        /// </summary>
+        /// <param name="t">The CLR type.</param>
+        /// <returns>A friendly type name string.</returns>
         public static string GetTypeName(Type t)
         {
             if (t == null) return "null";

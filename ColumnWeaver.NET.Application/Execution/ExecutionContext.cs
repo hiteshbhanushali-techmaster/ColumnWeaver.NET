@@ -20,8 +20,19 @@ namespace ColumnWeaver.NET.Application.Execution
         private int _highWaterMark = -1;
         private int _generation;
 
+        /// <summary>
+        /// Gets the source input object being processed.
+        /// </summary>
         public object? Source { get; private set; }
+
+        /// <summary>
+        /// Gets the total number of column slots allocated in this context.
+        /// </summary>
         public int ColumnCount { get; }
+
+        /// <summary>
+        /// Gets the array of variable values available during execution.
+        /// </summary>
         public object?[] Variables { get; private set; }
         private IReadOnlyDictionary<string, int> _variableIndexes;
 
@@ -39,6 +50,12 @@ namespace ColumnWeaver.NET.Application.Execution
             _variableIndexes = variableIndexes ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// Attempts to retrieve a variable value by name.
+        /// </summary>
+        /// <param name="name">The variable name.</param>
+        /// <param name="value">When this method returns, contains the variable value if found; otherwise, <c>null</c>.</param>
+        /// <returns><c>true</c> if the variable exists; otherwise, <c>false</c>.</returns>
         public bool TryGetVariable(string name, out object? value)
         {
             if (_variableIndexes.TryGetValue(name, out int index))
@@ -70,6 +87,12 @@ namespace ColumnWeaver.NET.Application.Execution
             _highWaterMark = -1;
         }
 
+        /// <summary>
+        /// Resets this context with a new source object, updated variables, and variable index map.
+        /// </summary>
+        /// <param name="source">The new source object.</param>
+        /// <param name="variables">The updated variables array.</param>
+        /// <param name="variableIndexes">The updated variable index dictionary.</param>
         public void Reset(object? source, object?[]? variables, IReadOnlyDictionary<string, int>? variableIndexes)
         {
             Reset(source);
@@ -77,6 +100,12 @@ namespace ColumnWeaver.NET.Application.Execution
             _variableIndexes = variableIndexes ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// Stores the raw evaluation result and formatted string output for the specified column index.
+        /// </summary>
+        /// <param name="index">The zero-based column index.</param>
+        /// <param name="rawValue">The raw evaluated object value.</param>
+        /// <param name="formattedValue">The formatted string representation.</param>
         public void SetResult(int index, object? rawValue, string formattedValue)
         {
             if (index > _highWaterMark) _highWaterMark = index;
@@ -85,6 +114,10 @@ namespace ColumnWeaver.NET.Application.Execution
             _evaluated[index] = true;
         }
 
+        /// <summary>
+        /// Marks the column at the specified index as skipped.
+        /// </summary>
+        /// <param name="index">The zero-based column index.</param>
         public void MarkSkipped(int index)
         {
             if (index > _highWaterMark) _highWaterMark = index;
@@ -92,11 +125,40 @@ namespace ColumnWeaver.NET.Application.Execution
             _evaluated[index] = true;
         }
 
+        /// <summary>
+        /// Retrieves the raw evaluated result for the column at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based column index.</param>
+        /// <returns>The raw result object, or <c>null</c>.</returns>
         public object? GetResult(int index) => _results[index];
+
+        /// <summary>
+        /// Retrieves the formatted string result for the column at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based column index.</param>
+        /// <returns>The formatted string, or <c>string.Empty</c> if not present.</returns>
         public string GetFormatted(int index) => _formatted[index] ?? string.Empty;
+
+        /// <summary>
+        /// Gets a value indicating whether the column at the specified index was skipped.
+        /// </summary>
+        /// <param name="index">The zero-based column index.</param>
+        /// <returns><c>true</c> if skipped; otherwise, <c>false</c>.</returns>
         public bool IsSkipped(int index) => _skipped[index];
+
+        /// <summary>
+        /// Gets a value indicating whether the column at the specified index has been evaluated.
+        /// </summary>
+        /// <param name="index">The zero-based column index.</param>
+        /// <returns><c>true</c> if evaluated; otherwise, <c>false</c>.</returns>
         public bool IsEvaluated(int index) => _evaluated[index];
 
+        /// <summary>
+        /// Formats an object value using an optional format string and the current culture.
+        /// </summary>
+        /// <param name="value">The object value to format.</param>
+        /// <param name="formatString">The format string, or <c>null</c>.</param>
+        /// <returns>The formatted string, or <c>string.Empty</c> if value is null.</returns>
         public static string FormatValue(object? value, string? formatString)
         {
             if (value == null) return string.Empty;

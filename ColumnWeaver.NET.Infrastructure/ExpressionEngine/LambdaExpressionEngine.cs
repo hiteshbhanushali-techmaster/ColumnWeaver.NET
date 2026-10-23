@@ -9,6 +9,10 @@ using ColumnWeaver.NET.Core.Interfaces;
 
 namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
 {
+    /// <summary>
+    /// An <see cref="IExpressionEngine"/> implementation that compiles expressions and conditions into
+    /// executable LINQ delegates, delegating to an underlying fallback engine when necessary.
+    /// </summary>
     public sealed class LambdaExpressionEngine : IExpressionEngine
     {
         private static readonly MethodInfo _getResultMethod
@@ -21,21 +25,40 @@ namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
         private readonly IExpressionEngine _fallback;
         private readonly ConcurrentDictionary<string, bool> _validationCache;
 
+        /// <summary>
+        /// Gets the capabilities supported by this expression engine.
+        /// </summary>
         public EngineCapabilities Capabilities =>
             new EngineCapabilities(supportsCompilation: true, supportsTyping: true);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LambdaExpressionEngine"/> class.
+        /// </summary>
+        /// <param name="fallback">The underlying expression engine used for fallback evaluation and validation.</param>
         public LambdaExpressionEngine(IExpressionEngine fallback)
         {
             _fallback        = fallback ?? throw new ArgumentNullException(nameof(fallback));
             _validationCache = new ConcurrentDictionary<string, bool>(StringComparer.Ordinal);
         }
 
+        /// <summary>
+        /// Evaluates an expression against the given execution context and returns its string representation.
+        /// </summary>
+        /// <param name="expression">The expression string to evaluate.</param>
+        /// <param name="context">The execution context.</param>
+        /// <returns>The evaluated string result.</returns>
         public string Evaluate(string expression, IExecutionContext context)
         {
             var result = EvaluateRaw(expression, context);
             return result?.ToString() ?? string.Empty;
         }
 
+        /// <summary>
+        /// Evaluates an expression against the given execution context and returns the raw object result.
+        /// </summary>
+        /// <param name="expression">The expression string to evaluate.</param>
+        /// <param name="context">The execution context.</param>
+        /// <returns>The raw evaluated object value.</returns>
         public object? EvaluateRaw(string expression, IExecutionContext context)
         {
             if (string.IsNullOrWhiteSpace(expression))
@@ -56,6 +79,12 @@ namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
             return _fallback.EvaluateRaw(expression, context);
         }
 
+        /// <summary>
+        /// Evaluates a boolean condition against the given execution context.
+        /// </summary>
+        /// <param name="conditionExpression">The condition expression to evaluate.</param>
+        /// <param name="context">The execution context.</param>
+        /// <returns><c>true</c> if condition evaluates to true; otherwise, <c>false</c>.</returns>
         public bool EvaluateCondition(string conditionExpression, IExecutionContext context)
         {
             if (string.IsNullOrWhiteSpace(conditionExpression))
@@ -68,6 +97,11 @@ namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
             catch { return _fallback.EvaluateCondition(conditionExpression, context); }
         }
 
+        /// <summary>
+        /// Validates whether an expression is syntactically valid.
+        /// </summary>
+        /// <param name="expression">The expression string to validate.</param>
+        /// <returns><c>true</c> if the expression is valid; otherwise, <c>false</c>.</returns>
         public bool ValidateExpression(string expression)
         {
             if (string.IsNullOrEmpty(expression)) return false;
@@ -79,6 +113,16 @@ namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
             });
         }
 
+        /// <summary>
+        /// Compiles an expression into an executable delegate.
+        /// </summary>
+        /// <param name="expression">The expression string to compile.</param>
+        /// <param name="sourceType">The optional source input type.</param>
+        /// <param name="dependencyIndexes">The column dependency indexes.</param>
+        /// <param name="variableIndexes">The variable index mapping dictionary.</param>
+        /// <param name="columnIndexes">The column index mapping dictionary.</param>
+        /// <param name="variableValues">The compiled variable values list.</param>
+        /// <returns>A compiled delegate, or <c>null</c> if the expression cannot be compiled.</returns>
         public Func<IExecutionContext, object?>? CompileExpression(
             string               expression,
             Type?                sourceType,
@@ -109,6 +153,16 @@ namespace ColumnWeaver.NET.Infrastructure.ExpressionEngine
             return null;
         }
 
+        /// <summary>
+        /// Compiles a condition expression into an executable boolean delegate.
+        /// </summary>
+        /// <param name="conditionExpression">The condition expression string to compile.</param>
+        /// <param name="sourceType">The optional source input type.</param>
+        /// <param name="dependencyIndexes">The column dependency indexes.</param>
+        /// <param name="variableIndexes">The variable index mapping dictionary.</param>
+        /// <param name="columnIndexes">The column index mapping dictionary.</param>
+        /// <param name="variableValues">The compiled variable values list.</param>
+        /// <returns>A compiled boolean delegate, or <c>null</c> if the condition cannot be compiled.</returns>
         public Func<IExecutionContext, bool>? CompileCondition(
             string               conditionExpression,
             Type?                sourceType,

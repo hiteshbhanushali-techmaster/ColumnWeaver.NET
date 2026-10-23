@@ -25,7 +25,7 @@ namespace ColumnWeaver.NET.Application.PostProcessing
         /// The ordered list of replacement rules. May be null or empty (no-op).
         /// </param>
         /// <returns>The value after all replacement rules have been applied.</returns>
-        public string Apply(string value, IList<ReplacementRule> rules)
+        public string Apply(string value, IList<ReplacementRule>? rules)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
             if (rules == null || rules.Count == 0) return value;
@@ -33,7 +33,7 @@ namespace ColumnWeaver.NET.Application.PostProcessing
             foreach (var rule in rules)
             {
                 // Skip malformed rules silently — source must be non-empty.
-                if (string.IsNullOrEmpty(rule.SourceValue)) continue;
+                if (rule == null || string.IsNullOrEmpty(rule.SourceValue)) continue;
 
                 var target = rule.TargetValue ?? string.Empty;
 

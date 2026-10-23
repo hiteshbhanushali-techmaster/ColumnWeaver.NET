@@ -67,18 +67,67 @@ namespace ColumnWeaver.NET.Application.Execution
     /// </summary>
     public sealed class ExecutionNodeRecord
     {
+        /// <summary>
+        /// Gets the unique identifier of the column definition.
+        /// </summary>
         public Guid ColumnId { get; }
+
+        /// <summary>
+        /// Gets the name of the column.
+        /// </summary>
         public string ColumnName { get; }
+
+        /// <summary>
+        /// Gets the zero-based index of the column in the plan.
+        /// </summary>
         public int ColumnIndex { get; }
+
+        /// <summary>
+        /// Gets the execution phase description (e.g., Evaluation or Assembly).
+        /// </summary>
         public string Phase { get; }
+
+        /// <summary>
+        /// Gets the elapsed duration in stopwatch ticks spent executing this node.
+        /// </summary>
         public long ElapsedTicks { get; }
+
+        /// <summary>
+        /// Gets the input value received by this node, or <c>null</c>.
+        /// </summary>
         public object? InputValue { get; }
+
+        /// <summary>
+        /// Gets the output value produced by this node, or <c>null</c>.
+        /// </summary>
         public object? OutputValue { get; }
+
+        /// <summary>
+        /// Gets the error message if node execution failed; otherwise, <c>null</c>.
+        /// </summary>
         public string? ErrorMessage { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether execution succeeded without errors.
+        /// </summary>
         public bool IsSuccess => string.IsNullOrEmpty(ErrorMessage);
 
+        /// <summary>
+        /// Gets the elapsed execution time in microseconds.
+        /// </summary>
         public double ElapsedMicroseconds => ElapsedTicks * 1_000_000.0 / Stopwatch.Frequency;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionNodeRecord"/> class.
+        /// </summary>
+        /// <param name="columnId">The column unique identifier.</param>
+        /// <param name="columnName">The column name.</param>
+        /// <param name="columnIndex">The zero-based column index.</param>
+        /// <param name="phase">The execution phase name.</param>
+        /// <param name="elapsedTicks">The elapsed stopwatch ticks.</param>
+        /// <param name="inputValue">The node input value.</param>
+        /// <param name="outputValue">The node output value.</param>
+        /// <param name="errorMessage">The error message, or <c>null</c>.</param>
         public ExecutionNodeRecord(
             Guid       columnId,
             string     columnName,
@@ -111,20 +160,64 @@ namespace ColumnWeaver.NET.Application.Execution
     /// </remarks>
     public sealed class ExecutionTrace
     {
+        /// <summary>
+        /// Gets the source input object parsed during this execution.
+        /// </summary>
         public object? Source { get; }
+
+        /// <summary>
+        /// Gets the UTC start time of the execution.
+        /// </summary>
         public DateTime StartTime { get; }
+
+        /// <summary>
+        /// Gets the UTC end time of the execution.
+        /// </summary>
         public DateTime EndTime { get; private set; }
+
+        /// <summary>
+        /// Gets the total elapsed ticks spent during execution.
+        /// </summary>
         public long TotalTicks { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether execution completed successfully.
+        /// </summary>
         public bool WasSuccessful { get; private set; }
+
+        /// <summary>
+        /// Gets the final formatted output string, or <c>null</c> if execution failed before assembly.
+        /// </summary>
         public string? FinalOutput { get; private set; }
+
+        /// <summary>
+        /// Gets the top-level error message if execution failed; otherwise, <c>null</c>.
+        /// </summary>
         public string? ErrorMessage { get; private set; }
+
+        /// <summary>
+        /// Gets the ordered list of execution records for each node visited during execution.
+        /// </summary>
         public IReadOnlyList<ExecutionNodeRecord> NodeRecords { get; }
+
+        /// <summary>
+        /// Gets the count of execution passes per column index.
+        /// </summary>
         public IReadOnlyDictionary<int, int> ExecutionCounts { get; }
+
+        /// <summary>
+        /// Gets the list of variable values present during execution.
+        /// </summary>
         public IReadOnlyList<object?> Variables { get; }
 
         private readonly List<ExecutionNodeRecord> _records;
         private readonly Dictionary<int, int> _counts;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionTrace"/> class.
+        /// </summary>
+        /// <param name="source">The source object being parsed.</param>
+        /// <param name="variables">The optional variables collection.</param>
         public ExecutionTrace(object? source, IReadOnlyList<object?>? variables = null)
         {
             Source            = source;
@@ -137,6 +230,17 @@ namespace ColumnWeaver.NET.Application.Execution
             WasSuccessful      = true;
         }
 
+        /// <summary>
+        /// Records execution details for an individual execution node.
+        /// </summary>
+        /// <param name="columnId">The column unique identifier.</param>
+        /// <param name="columnName">The column name.</param>
+        /// <param name="columnIndex">The zero-based column index.</param>
+        /// <param name="phase">The execution phase name.</param>
+        /// <param name="elapsedTicks">The elapsed duration in stopwatch ticks.</param>
+        /// <param name="inputValue">The node input value.</param>
+        /// <param name="outputValue">The node output value.</param>
+        /// <param name="errorMessage">The error message, or <c>null</c>.</param>
         public void RecordNodeExecution(
             Guid       columnId,
             string     columnName,
@@ -159,6 +263,11 @@ namespace ColumnWeaver.NET.Application.Execution
                 WasSuccessful = false;
         }
 
+        /// <summary>
+        /// Marks the execution trace as completed with the specified output string and optional error message.
+        /// </summary>
+        /// <param name="finalOutput">The final assembled output string.</param>
+        /// <param name="errorMessage">The optional error message.</param>
         public void Complete(string? finalOutput, string? errorMessage = null)
         {
             EndTime      = DateTime.UtcNow;
@@ -167,6 +276,10 @@ namespace ColumnWeaver.NET.Application.Execution
             ErrorMessage = errorMessage;
         }
 
+        /// <summary>
+        /// Marks the execution trace as failed with the specified error message.
+        /// </summary>
+        /// <param name="errorMessage">The error message describing the failure.</param>
         public void MarkFailed(string errorMessage)
         {
             WasSuccessful = false;
@@ -175,6 +288,9 @@ namespace ColumnWeaver.NET.Application.Execution
             TotalTicks   = (EndTime - StartTime).Ticks;
         }
 
+        /// <summary>
+        /// Gets the total execution duration in microseconds.
+        /// </summary>
         public double TotalMicroseconds => TotalTicks * 1_000_000.0 / Stopwatch.Frequency;
     }
 

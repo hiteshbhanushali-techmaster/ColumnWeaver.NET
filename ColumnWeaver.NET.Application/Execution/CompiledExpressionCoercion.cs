@@ -8,6 +8,11 @@ namespace ColumnWeaver.NET.Application.Execution
     /// </summary>
     public static class CompiledExpressionCoercion
     {
+        /// <summary>
+        /// Coerces a value to a 64-bit floating-point number using invariant culture, returning 0.0 on conversion failure.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>The double representation, or 0.0 if null or unparseable.</returns>
         public static double ToDouble(object? value)
         {
             if (value == null) return 0.0;
@@ -22,6 +27,11 @@ namespace ColumnWeaver.NET.Application.Execution
             catch { return 0.0; }
         }
 
+        /// <summary>
+        /// Coerces a value to a decimal number using invariant culture, returning 0m on conversion failure.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>The decimal representation, or 0m if null or unparseable.</returns>
         public static decimal ToDecimal(object? value)
         {
             if (value == null) return 0m;
@@ -36,6 +46,11 @@ namespace ColumnWeaver.NET.Application.Execution
             catch { return 0m; }
         }
 
+        /// <summary>
+        /// Coerces a value to a 32-bit signed integer using invariant culture, returning 0 on conversion failure.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>The 32-bit integer representation, or 0 if null or unparseable.</returns>
         public static int ToInt32(object? value)
         {
             if (value == null) return 0;
@@ -50,6 +65,11 @@ namespace ColumnWeaver.NET.Application.Execution
             catch { return 0; }
         }
 
+        /// <summary>
+        /// Coerces a value to a 64-bit signed integer using invariant culture, returning 0L on conversion failure.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>The 64-bit integer representation, or 0L if null or unparseable.</returns>
         public static long ToInt64(object? value)
         {
             if (value == null) return 0L;
@@ -64,6 +84,11 @@ namespace ColumnWeaver.NET.Application.Execution
             catch { return 0L; }
         }
 
+        /// <summary>
+        /// Evaluates the truthiness of a value, converting booleans, non-zero numbers, and non-empty strings to true.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns><c>true</c> if the value is truthy; otherwise, <c>false</c>.</returns>
         public static bool ToBoolean(object? value)
         {
             if (value == null) return false;
@@ -82,6 +107,11 @@ namespace ColumnWeaver.NET.Application.Execution
             catch { return false; }
         }
 
+        /// <summary>
+        /// Converts a value to its string representation using invariant culture, returning an empty string for null.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>A string representation of the value, or <c>string.Empty</c> if null.</returns>
         public static string ToString(object? value)
         {
             if (value == null) return string.Empty;
@@ -90,6 +120,11 @@ namespace ColumnWeaver.NET.Application.Execution
             return value.ToString() ?? string.Empty;
         }
 
+        /// <summary>
+        /// Determines whether the specified type is a supported numeric primitive or nullable numeric type.
+        /// </summary>
+        /// <param name="type">The type to test.</param>
+        /// <returns><c>true</c> if the type is numeric; otherwise, <c>false</c>.</returns>
         public static bool IsNumericType(Type type)
         {
             if (type == null) return false;
@@ -103,6 +138,12 @@ namespace ColumnWeaver.NET.Application.Execution
                    nnType == typeof(byte);
         }
 
+        /// <summary>
+        /// Determines the common widening numeric type between two operand types.
+        /// </summary>
+        /// <param name="left">The left operand type.</param>
+        /// <param name="right">The right operand type.</param>
+        /// <returns>The common numeric promotion type.</returns>
         public static Type GetCommonNumericType(Type left, Type right)
         {
             var l = Nullable.GetUnderlyingType(left) ?? left;
@@ -120,6 +161,12 @@ namespace ColumnWeaver.NET.Application.Execution
             return typeof(int);
         }
 
+        /// <summary>
+        /// Performs addition or string concatenation on two operand values.
+        /// </summary>
+        /// <param name="left">The left operand value.</param>
+        /// <param name="right">The right operand value.</param>
+        /// <returns>The sum or concatenated string result.</returns>
         public static object? Add(object? left, object? right)
         {
             if (left is string || right is string)
@@ -131,6 +178,12 @@ namespace ColumnWeaver.NET.Application.Execution
             return ToDouble(left) + ToDouble(right);
         }
 
+        /// <summary>
+        /// Performs subtraction on two numeric operand values.
+        /// </summary>
+        /// <param name="left">The left operand value.</param>
+        /// <param name="right">The right operand value.</param>
+        /// <returns>The difference result.</returns>
         public static object? Subtract(object? left, object? right)
         {
             if (left is decimal || right is decimal)
@@ -139,6 +192,12 @@ namespace ColumnWeaver.NET.Application.Execution
             return ToDouble(left) - ToDouble(right);
         }
 
+        /// <summary>
+        /// Performs multiplication on two numeric operand values.
+        /// </summary>
+        /// <param name="left">The left operand value.</param>
+        /// <param name="right">The right operand value.</param>
+        /// <returns>The product result.</returns>
         public static object? Multiply(object? left, object? right)
         {
             if (left is decimal || right is decimal)
@@ -147,6 +206,12 @@ namespace ColumnWeaver.NET.Application.Execution
             return ToDouble(left) * ToDouble(right);
         }
 
+        /// <summary>
+        /// Performs division on two numeric operand values, returning 0 if the divisor is 0.
+        /// </summary>
+        /// <param name="left">The dividend value.</param>
+        /// <param name="right">The divisor value.</param>
+        /// <returns>The quotient result, or 0 if dividing by zero.</returns>
         public static object? Divide(object? left, object? right)
         {
             if (left is decimal || right is decimal)
@@ -159,12 +224,24 @@ namespace ColumnWeaver.NET.Application.Execution
             return rDbl == 0.0 ? 0.0 : ToDouble(left) / rDbl;
         }
 
+        /// <summary>
+        /// Performs modulo on two numeric operand values, returning 0 if the divisor is 0.
+        /// </summary>
+        /// <param name="left">The dividend value.</param>
+        /// <param name="right">The divisor value.</param>
+        /// <returns>The remainder result, or 0 if dividing by zero.</returns>
         public static object? Modulo(object? left, object? right)
         {
             var rDbl = ToDouble(right);
             return rDbl == 0.0 ? 0.0 : ToDouble(left) % rDbl;
         }
 
+        /// <summary>
+        /// Determines equality between two operand values using numeric coercion or case-insensitive string comparison where applicable.
+        /// </summary>
+        /// <param name="left">The first operand value.</param>
+        /// <param name="right">The second operand value.</param>
+        /// <returns><c>true</c> if the operands are considered equal; otherwise, <c>false</c>.</returns>
         public static bool AreEqual(object? left, object? right)
         {
             if (left == null && right == null) return true;
@@ -182,6 +259,12 @@ namespace ColumnWeaver.NET.Application.Execution
             return Equals(left, right);
         }
 
+        /// <summary>
+        /// Compares two operand values for relative ordering.
+        /// </summary>
+        /// <param name="left">The first operand value.</param>
+        /// <param name="right">The second operand value.</param>
+        /// <returns>A negative integer if <paramref name="left"/> is less than <paramref name="right"/>, zero if equal, or a positive integer if greater.</returns>
         public static int Compare(object? left, object? right)
         {
             if (left == null && right == null) return 0;

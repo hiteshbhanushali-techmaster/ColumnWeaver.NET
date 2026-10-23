@@ -59,6 +59,15 @@ namespace ColumnWeaver.NET.Application.Execution
             = typeof(IExecutionContext).GetMethod(nameof(IExecutionContext.GetResult))
               ?? throw new InvalidOperationException("IExecutionContext.GetResult not found.");
 
+        /// <summary>
+        /// Compiles an expression string into an executable delegate that accepts an execution context and returns the evaluated result.
+        /// </summary>
+        /// <param name="expression">The expression string to compile.</param>
+        /// <param name="sourceType">The optional source input type.</param>
+        /// <param name="variableIndexes">The map of variable names to variable array indexes.</param>
+        /// <param name="columnIndexes">The map of column names to column result array indexes.</param>
+        /// <param name="variableValues">The list of compiled variable values.</param>
+        /// <returns>A compiled delegate, or <c>null</c> if compilation fails.</returns>
         public static Func<IExecutionContext, object?>? Compile(
             string expression,
             Type? sourceType,
@@ -88,6 +97,15 @@ namespace ColumnWeaver.NET.Application.Execution
             }
         }
 
+        /// <summary>
+        /// Compiles a condition expression string into an executable delegate that evaluates to a boolean value.
+        /// </summary>
+        /// <param name="conditionExpression">The boolean condition expression string to compile.</param>
+        /// <param name="sourceType">The optional source input type.</param>
+        /// <param name="variableIndexes">The map of variable names to variable array indexes.</param>
+        /// <param name="columnIndexes">The map of column names to column result array indexes.</param>
+        /// <param name="variableValues">The list of compiled variable values.</param>
+        /// <returns>A compiled boolean delegate, or <c>null</c> if compilation fails.</returns>
         public static Func<IExecutionContext, bool>? CompileCondition(
             string conditionExpression,
             Type? sourceType,
@@ -130,6 +148,15 @@ namespace ColumnWeaver.NET.Application.Execution
             }
         }
 
+        /// <summary>
+        /// Parses an expression and constructs a strongly-typed LINQ <see cref="Expression"/> tree.
+        /// </summary>
+        /// <param name="expression">The expression string to parse.</param>
+        /// <param name="sourceType">The optional source input type.</param>
+        /// <param name="sourceExpr">The source object parameter expression.</param>
+        /// <param name="columnExpressions">A dictionary of pre-built expressions for named columns.</param>
+        /// <param name="variableValuesByName">A dictionary of variable names and values.</param>
+        /// <returns>A strongly-typed expression tree, or <c>null</c> if building fails.</returns>
         public static Expression? BuildTypedExpression(
             string expression,
             Type? sourceType,

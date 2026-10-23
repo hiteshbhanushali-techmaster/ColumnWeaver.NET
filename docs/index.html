@@ -60,15 +60,22 @@
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
-    "@type":"SoftwareApplication",
+    "@type":"SoftwareSourceCode",
     "name":"ColumnWeaver.NET",
     "applicationCategory":"DeveloperApplication",
     "operatingSystem":"Windows",
     "softwareRequirements":".NET Framework 4.8 or .NET Standard 2.0 (.NET 6/8/9+)",
     "description":"A reusable object-to-string transformation library for applying client- and product-specific formatting schemas without rewriting application transformation code.",
     "author":{"@type":"Person","name":"Hitesh Bhanushali"},
-    "programmingLanguage":"C#"
-    ,"keywords":"client-specific formatting, configurable object-to-string transformation, customer-specific export, trading data formatting, financial market integration, delimited records, fixed-width output"
+    "programmingLanguage":"C#",
+    "codeRepository":"https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET",
+    "runtimePlatform":".NET Framework 4.8, .NET Standard 2.0",
+    "license":"https://www.gnu.org/licenses/agpl-3.0.html",
+    "sameAs":[
+      "https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET",
+      "https://www.nuget.org/packages/ColumnWeaver.NET/"
+    ],
+    "keywords":"client-specific formatting, configurable object-to-string transformation, customer-specific export, trading data formatting, financial market integration, delimited records, fixed-width output"
   }
   </script>
 </head>
@@ -77,7 +84,7 @@
     <div class="wrap">
       <nav aria-label="Main navigation">
         <a class="brand" href="#top"><img src="assets/columnweaver-icon.png" alt="ColumnWeaver.NET woven-columns mark"><strong>ColumnWeaver.NET</strong></a>
-        <div class="links"><a href="#why">Why ColumnWeaver</a><a href="#features">Features</a><a href="#use-case">Trading use case</a><a href="#benchmarks">Benchmarks</a><a href="#quickstart">Quick start</a><a href="#terms">Terms</a></div>
+        <div class="links"><a href="#why">Why ColumnWeaver</a><a href="#features">Features</a><a href="#use-case">Trading use case</a><a href="questions.html">Common questions</a><a href="#benchmarks">Benchmarks</a><a href="#quickstart">Quick start</a><a href="#terms">Terms</a></div>
       </nav>
       <div id="top" class="eyebrow">One transformation engine · client-owned output formats</div>
       <h1>Give every client the format they need—without rewriting your application.</h1>
@@ -107,14 +114,30 @@
         <article class="card"><h3>Process streams</h3><p><code>ParseMany</code> supports forward-only input and returns rows incrementally without buffering the whole input.</p></article>
         <article class="card"><h3>Keep authoring flexible</h3><p>Configure pipelines in code or through the WinForms configurator and preview behavior before deployment.</p></article>
       </div>
-      <p class="muted">See the <a href="features.md">complete feature and configurator reference</a> for all five column types, shared per-column controls, supported combinations, and API-only settings. The configurator currently saves/opens JSON; XML serialization is available through the library API. Preserving separator slots for disabled columns is also API-only.</p>
+      <p class="muted">See the <a href="features.html">complete feature and configurator reference</a> for all five column types, shared per-column controls, supported combinations, and API-only settings. The configurator currently saves/opens JSON; XML serialization is available through the library API. Preserving separator slots for disabled columns is also API-only.</p>
       <figure class="configurator-demo"><img src="assets/configurator-demo.gif" alt="ColumnWeaver.NET configurator editing a formula and variables, then parsing sample JSON to preview the formatted row" loading="lazy"><figcaption>Configurator workflow: edit a formula, set its variables, and preview the resulting row from sample JSON.</figcaption></figure>
     </section>
     <section id="use-case">
       <div class="eyebrow">A concrete integration pattern</div><h2>One trade record, different client layouts</h2>
       <p class="lead">A trading application can reuse the same execution object while each destination selects its own fields, order, labels, conditions, and calculations. The host selects a precompiled schema for the destination; ColumnWeaver.NET formats the object into a string.</p>
-      <p>See the <a href="use-cases/client-specific-trading-records.md">worked client-specific trading record example</a> for two schemas applied to the same record, installation instructions, and production validation boundaries.</p>
+      <p>See the <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/use-cases/client-specific-trading-records.md">worked client-specific trading record example</a> for two schemas applied to the same record, installation instructions, and production validation boundaries.</p>
       <p class="note">The guide is illustrative. ColumnWeaver.NET returns formatted strings; the application must implement and validate any broker, exchange, FIX, drop-copy, framing, escaping, and delivery requirements.</p>
+    </section>
+    <section id="questions">
+      <div class="eyebrow">Common questions</div><h2>Configurable object-to-text formatting in .NET</h2>
+      <h3>Can different clients get different text formats from the same C# object?</h3>
+      <p>Yes. Create a reusable <code>ParserConfiguration</code> for each output contract, then apply each configuration to the same source object through a <code>ColumnWeaverClient</code>. The host chooses the client schema; it does not need a separate formatter implementation for each layout.</p>
+      <h3>How can I avoid hard-coded formatting logic for every customer?</h3>
+      <p>Move client-specific field selection, order, labels, formulas, conditions, separators, and value rules into configuration. Keep application logic for selecting the destination schema and delivering the resulting string.</p>
+      <h3>Can a schema use properties, formulas, and conditional columns?</h3>
+      <p>ColumnWeaver.NET supports property, formula, conditional, custom-function, and fixed-text columns. Schemas can also use typed variables, earlier-column dependencies, null strategies, format strings, padding, prefixes, suffixes, and replacements. The <a href="features.html">feature reference</a> lists exact behavior and configurator limits.</p>
+      <h3>Is this an ETL, serialization, or trading protocol library?</h3>
+      <p>No. It is a focused object-to-string formatting engine. It returns a formatted string; the host application owns transport, protocol compliance, persistence, framing, escaping, and delivery.</p>
+      <h3>Is it suitable for real-time or high-throughput applications?</h3>
+      <p>It offers reusable compiled and precompiled execution paths, but suitability depends on the schema and full application workload. The published benchmarks show hard-coded C# is faster in several scenarios. Measure representative data, allocations, and tail latency before production use.</p>
+      <h3>How is this different from string interpolation or a general ETL pipeline?</h3>
+      <p>String interpolation is a good fit for a format fixed in application code. ColumnWeaver.NET is for layouts that vary by client, product, or integration and should be supplied as reusable configuration. It does not replace a general ETL system when data sources, joins, routing, or storage are required.</p>
+      <p>See the <a href="questions.html">full question guide</a> for implementation, architecture, trading, and package-discovery questions.</p>
     </section>
     <section id="benchmarks">
       <div class="eyebrow">Measured, not promised</div><h2>Performance depends on the schema</h2>

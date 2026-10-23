@@ -36,8 +36,18 @@ namespace ColumnWeaver.NET.Application.Execution
             get { lock (_lock) { return _plans.Count; } }
         }
 
+        /// <summary>
+        /// Attempts to retrieve a cached <see cref="ExecutionPlan"/> for the given configuration.
+        /// </summary>
+        /// <param name="config">The parser configuration.</param>
+        /// <returns>The cached execution plan, or <c>null</c> if not present.</returns>
         public ExecutionPlan? TryGet(ParserConfiguration config) => TryGet(config, null);
 
+        /// <summary>
+        /// Attempts to retrieve a cached <see cref="ExecutionPlan"/> by its 64-bit fingerprint.
+        /// </summary>
+        /// <param name="fingerprint">The 64-bit fast fingerprint.</param>
+        /// <returns>The cached execution plan, or <c>null</c> if not present.</returns>
         public ExecutionPlan? TryGet(ulong fingerprint)
         {
             lock (_lock)
@@ -68,6 +78,11 @@ namespace ColumnWeaver.NET.Application.Execution
         /// </summary>
         public void Put(ParserConfiguration config, ExecutionPlan plan) => Put(config, plan, null);
 
+        /// <summary>
+        /// Stores an <see cref="ExecutionPlan"/> in the cache keyed by its 64-bit fingerprint.
+        /// </summary>
+        /// <param name="fingerprint">The 64-bit fast fingerprint.</param>
+        /// <param name="plan">The compiled execution plan.</param>
         public void Put(ulong fingerprint, ExecutionPlan plan)
         {
             if (plan == null) return;
@@ -313,7 +328,7 @@ namespace ColumnWeaver.NET.Application.Execution
 
             hash = HashString(hash, config.Name);
             hash = HashString(hash, config.GlobalSeparator);
-            hash ^= (ulong)(config.AutoSortByOrder ? 1 : 0) | ((ulong)(config.PreserveSeparatorForDisabledColumns ? 1 : 0) << 1);
+            hash ^= (config.AutoSortByOrder ? 1UL : 0UL) | ((config.PreserveSeparatorForDisabledColumns ? 1UL : 0UL) << 1);
             hash *= FNV_PRIME;
 
             if (sourceType != null)
@@ -341,7 +356,10 @@ namespace ColumnWeaver.NET.Application.Execution
                     hash = HashGuid(hash, col.Id);
                     hash = HashString(hash, col.Name);
                     if (col.Alias != null) hash = HashString(hash, col.Alias);
-                    hash ^= (ulong)col.Order | ((ulong)(col.IsEnabled ? 1 : 0) << 32);
+                    // Keep the signed order's 32-bit representation separate from
+                    // the enabled flag. A direct int-to-ulong conversion sign-extends
+                    // negative orders and can overwrite the flag bit.
+                    hash ^= (ulong)(uint)col.Order | ((col.IsEnabled ? 1UL : 0UL) << 32);
                     hash *= FNV_PRIME;
                     if (col.SeparatorOverride != null) hash = HashString(hash, col.SeparatorOverride);
 
@@ -389,7 +407,7 @@ namespace ColumnWeaver.NET.Application.Execution
                             if (r == null) continue;
                             hash = HashString(hash, r.SourceValue);
                             hash = HashString(hash, r.TargetValue);
-                            hash ^= (ulong)(r.IsCaseSensitive ? 1 : 0) | ((ulong)(r.UseRegex ? 1 : 0) << 1);
+                            hash ^= (r.IsCaseSensitive ? 1UL : 0UL) | ((r.UseRegex ? 1UL : 0UL) << 1);
                             hash *= FNV_PRIME;
                         }
                     }
@@ -453,7 +471,7 @@ namespace ColumnWeaver.NET.Application.Execution
                         }
                         else if (val is bool b)
                         {
-                            vh ^= (ulong)(b ? 1 : 0); vh *= FNV_PRIME;
+                            vh ^= (b ? 1UL : 0UL); vh *= FNV_PRIME;
                         }
                         else if (val is int itg)
                         {

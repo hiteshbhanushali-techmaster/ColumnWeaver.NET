@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Answers about configurable object-to-string formatting in .NET: client-specific schemas, formulas, conditions, trading records, performance, and the ColumnWeaver.NET NuGet package.">
+  <meta name="author" content="Hitesh Bhanushali">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Configurable object-to-string formatting in .NET | ColumnWeaver.NET">
+  <meta property="og:description" content="Practical answers for generating client-specific text records from .NET objects with reusable schemas.">
+  <meta property="og:url" content="https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/questions.html">
+  <link rel="canonical" href="https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/questions.html">
+  <title>Configurable object-to-string formatting in .NET | ColumnWeaver.NET</title>
+  <style>
+    :root { color-scheme:dark; --bg:#0b1020; --panel:#121a30; --line:#263452; --text:#edf4ff; --muted:#aab8d2; --cyan:#58d8ed }
+    * { box-sizing:border-box }
+    body { margin:0; background:var(--bg); color:var(--text); font:16px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif }
+    main { width:min(900px,calc(100% - 36px)); margin:40px auto 72px }
+    a { color:var(--cyan) }
+    nav { margin-bottom:34px }
+    h1 { font-size:clamp(2rem,5vw,3.5rem); line-height:1.12 }
+    h2 { margin-top:38px; padding-top:22px; border-top:1px solid var(--line); font-size:1.55rem }
+    h3 { margin:26px 0 6px; font-size:1.12rem }
+    p,li { color:var(--muted) }
+    .intro,.callout { padding:18px 20px; background:var(--panel); border:1px solid var(--line); border-radius:12px }
+    code { color:#d9e9ff }
+  </style>
+</head>
+<body>
+<main>
+  <nav><a href="./">ColumnWeaver.NET home</a> · <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET">GitHub</a> · <a href="https://www.nuget.org/packages/ColumnWeaver.NET/">NuGet</a></nav>
+  <h1>Answers about client-specific text formatting in .NET</h1>
+  <p class="intro">ColumnWeaver.NET is a C# library for applying reusable, configurable output schemas to .NET objects. It is intended for applications that need different text layouts for different customers, products, or integrations without maintaining a separate hard-coded formatter for every layout.</p>
+
+  <h2>Beginner questions</h2>
+  <h3>1. Can I generate different text output formats from the same object for different clients?</h3>
+  <p>Yes. Create one <code>ParserConfiguration</code> per output contract and reuse the same source model with each schema. The application selects the schema for the destination, and <code>ColumnWeaverClient</code> returns the formatted string.</p>
+
+  <h3>2. How can I avoid separate hard-coded string formatting logic for every customer?</h3>
+  <p>Put differences such as selected fields, column order, labels, separators, calculations, conditions, and formatting rules in configuration. This avoids cloning the formatter for each customer. The application still owns schema selection and output delivery.</p>
+
+  <h3>3. Is there a NuGet package for configurable object-to-text output with properties, formulas, and conditions?</h3>
+  <p>ColumnWeaver.NET is published on NuGet as <a href="https://www.nuget.org/packages/ColumnWeaver.NET/">ColumnWeaver.NET</a>. The project currently documents package version <code>1.0.0-beta</code>, targeting .NET Framework 4.8 and .NET Standard 2.0. Check the package page for the current version and compatibility before installing.</p>
+
+  <h2>Implementation and architecture</h2>
+  <h3>4. Which C# library can create configurable object-to-string transformations with computed and conditional columns?</h3>
+  <p>ColumnWeaver.NET is designed for this focused use case. It supports property, formula, conditional, custom-function, and fixed-text columns, with shared options such as ordering, null handling, formatting, and replacement rules. Review the <a href="features.html">feature reference</a> for exact supported behavior.</p>
+
+  <h3>5. How do I build delimited text records from configuration?</h3>
+  <p>Define an output schema with the desired columns and a global separator, optionally overriding separators for particular columns. Create the parser when loading the schema and reuse it for records. For stable schemas, use the precompiled client path. Delimiter selection alone does not provide CSV quoting or protocol escaping; implement those requirements for the receiving contract.</p>
+
+  <h3>6. What can replace nested string interpolation when output layouts vary by customer?</h3>
+  <p>When a layout is fixed in code, interpolation remains simple and efficient. When clients need different layouts that should change independently of application code, a reusable schema-driven formatter such as ColumnWeaver.NET can keep those variations in configuration.</p>
+
+  <h3>7. Does it compile transformation pipelines and support dependent computed columns?</h3>
+  <p>ColumnWeaver.NET compiles reusable execution plans and supports formulas that refer to earlier columns and typed configuration variables. Simple expressions may use compiled delegates; other expressions can use the NCalc fallback. The exact expression and performance depend on the chosen path.</p>
+
+  <h3>8. How can an application produce several output schemas from one object model?</h3>
+  <p>Keep a shared source type, define and validate a schema for each output contract, then create and reuse a parser for each schema. Choose the parser in application-level destination logic. The library formats rows; it does not route or deliver them.</p>
+
+  <h2>Trading and high-throughput questions</h2>
+  <h3>9. Can I generate broker-specific trade records from one canonical trade object?</h3>
+  <p>That is a representative use case: apply separate schemas to the same trade or execution object to vary fields, labels, order, calculations, and status codes. The example is illustrative and is not a claim of FIX, broker, exchange, or drop-copy compliance. Validate the output against each receiver’s specification.</p>
+
+  <h3>10. Is it a high-throughput fixed-width record formatter?</h3>
+  <p>It supports reusable compiled parsing and per-column trimming, length limits, padding, and formatting that can be used to construct fixed-width layouts. Benchmarks show the measured scenarios only; they do not establish production throughput or tail latency. Profile representative records and validate exact field widths and receiver rules.</p>
+
+  <h2>Open-source and package questions</h2>
+  <h3>11. Is it a lightweight alternative to a large ETL platform?</h3>
+  <p>It can fit applications that only need configurable object-to-string formatting. It is not a general ETL platform: it does not provide source connectors, joins, workflow orchestration, storage, or delivery. Choose a broader data pipeline when those features are needed.</p>
+
+  <h3>12. Does it support custom functions as well as formulas and conditions?</h3>
+  <p>Yes. Applications can register custom functions and reference them from custom-function columns. Function availability and behavior come from the consuming application’s registry. The library also supports formula, conditional, property, and fixed-text columns.</p>
+
+  <h2>Project links and evidence</h2>
+  <ul>
+    <li><a href="https://www.nuget.org/packages/ColumnWeaver.NET/">Install ColumnWeaver.NET from NuGet</a></li>
+    <li><a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET">Browse the source and examples on GitHub</a></li>
+    <li><a href="features.html">Read the feature and configurator reference</a></li>
+    <li><a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/use-cases/client-specific-trading-records.md">View the illustrative trading record example</a></li>
+    <li><a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.Benchmarks.ParserBenchmarks-report-github.md">Read the reproducible benchmark report</a></li>
+  </ul>
+  <p class="callout">Performance is workload-specific. Hard-coded C# is faster in several measured individual cases; ColumnWeaver.NET trades some execution overhead for runtime-configurable, reusable output schemas.</p>
+</main>
+</body>
+</html>

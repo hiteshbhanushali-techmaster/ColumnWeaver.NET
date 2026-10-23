@@ -60,6 +60,12 @@ namespace ColumnWeaver.NET.Application.Engine
         /// <summary>Gets the configuration that governs this parse operation.</summary>
         public ParserConfiguration Configuration { get; }
 
+        /// <summary>
+        /// Attempts to retrieve the value of a configuration variable by name.
+        /// </summary>
+        /// <param name="name">The name of the variable to look up.</param>
+        /// <param name="value">When this method returns, contains the variable value if found; otherwise, <c>null</c>.</param>
+        /// <returns><c>true</c> if the variable exists in the configuration; otherwise, <c>false</c>.</returns>
         public bool TryGetVariable(string name, out object? value)
         {
             if (Configuration.Variables != null && Configuration.Variables.TryGetValue(name, out value))
@@ -70,8 +76,16 @@ namespace ColumnWeaver.NET.Application.Engine
             return false;
         }
 
+        /// <summary>
+        /// Gets the evaluated result for the specified column index, returning <c>null</c> in this context implementation.
+        /// </summary>
+        /// <param name="index">The zero-based column index.</param>
+        /// <returns><c>null</c> for this context implementation.</returns>
         public object? GetResult(int index) => null;
 
+        /// <summary>
+        /// Gets the configuration variables array for this context implementation.
+        /// </summary>
         public object?[] Variables { get; } = Array.Empty<object?>();
 
 

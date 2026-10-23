@@ -55,6 +55,19 @@ namespace ColumnWeaver.NET.Application.Execution
         private static readonly NullHandler _nullHandler = new NullHandler();
         private static readonly ReplacementApplicator _replacementApplicator = new ReplacementApplicator();
 
+        /// <summary>
+        /// Attempts to compile a specialized row executor delegate for the given configuration and source type.
+        /// </summary>
+        /// <param name="config">The parser configuration.</param>
+        /// <param name="sourceType">The source object type.</param>
+        /// <param name="evaluationOrder">The execution nodes in topological evaluation order.</param>
+        /// <param name="assemblyOrder">The execution nodes in final assembly order.</param>
+        /// <param name="allColumns">All column definitions in the configuration.</param>
+        /// <param name="nameToIndex">Map of column names to indices.</param>
+        /// <param name="variableIndexes">Map of variable names to indices.</param>
+        /// <param name="compiledVariables">Array of compiled variable values.</param>
+        /// <param name="registry">The custom function registry, or <c>null</c>.</param>
+        /// <returns>A compiled row executor delegate, or <c>null</c> if specialized compilation is not applicable.</returns>
         public static Func<object?, StringBuilder, string>? TryBuild(
             ParserConfiguration config,
             Type? sourceType,
@@ -146,7 +159,10 @@ namespace ColumnWeaver.NET.Application.Execution
                             break;
 
                         case FormulaColumn fc:
-                            var trimmedExpr = fc.Expression?.Trim() ?? string.Empty;
+                            var expr = fc.Expression;
+                            if (expr == null || string.IsNullOrWhiteSpace(expr)) return null;
+
+                            var trimmedExpr = expr.Trim();
                             if (trimmedExpr.StartsWith("${") && trimmedExpr.EndsWith("}"))
                             {
                                 var varName = trimmedExpr.Substring(2, trimmedExpr.Length - 3).Trim();
@@ -157,12 +173,15 @@ namespace ColumnWeaver.NET.Application.Execution
                                 }
                             }
 
-                            colExpr = CompiledExpressionBuilder.BuildTypedExpression(fc.Expression, sourceType, srcVar, colExprByName, varValuesByName);
+                            colExpr = CompiledExpressionBuilder.BuildTypedExpression(expr, sourceType, srcVar, colExprByName, varValuesByName);
                             if (colExpr == null) return null;
                             break;
 
                         case ConditionalColumn cc:
-                            var condExpr = CompiledExpressionBuilder.BuildTypedExpression(cc.ConditionExpression, sourceType, srcVar, colExprByName, varValuesByName);
+                            var condExprStr = cc.ConditionExpression;
+                            if (condExprStr == null || string.IsNullOrWhiteSpace(condExprStr)) return null;
+
+                            var condExpr = CompiledExpressionBuilder.BuildTypedExpression(condExprStr, sourceType, srcVar, colExprByName, varValuesByName);
                             if (condExpr == null) return null;
 
                             Expression boolCond = condExpr.Type == typeof(bool)
@@ -319,12 +338,14 @@ namespace ColumnWeaver.NET.Application.Execution
             IReadOnlyDictionary<string, Expression> colExprByName,
             IReadOnlyDictionary<string, object?> varValuesByName)
         {
-            if (string.IsNullOrEmpty(branch))
+            if (branch == null || branch.Length == 0)
                 return Expression.Constant(string.Empty, typeof(string));
 
             if (branch.StartsWith("="))
             {
-                return CompiledExpressionBuilder.BuildTypedExpression(branch.Substring(1).Trim(), sourceType, srcVar, colExprByName, varValuesByName);
+                var expr = branch.Substring(1).Trim();
+                if (expr.Length == 0) return null;
+                return CompiledExpressionBuilder.BuildTypedExpression(expr, sourceType, srcVar, colExprByName, varValuesByName);
             }
 
             return ResolveTextParameter(branch, colExprByName, varValuesByName);
@@ -522,6 +543,13 @@ namespace ColumnWeaver.NET.Application.Execution
             }
         }
 
+        /// <summary>
+        /// Formats and appends a single column value to the string builder applying null-handling, formatting, and replacements.
+        /// </summary>
+        /// <param name="sb">The target string builder.</param>
+        /// <param name="rawValue">The raw evaluated object value.</param>
+        /// <param name="formatString">The optional format string.</param>
+        /// <param name="col">The column definition containing post-processing options.</param>
         public static void AppendFormattedColumn(
             StringBuilder sb,
             object? rawValue,

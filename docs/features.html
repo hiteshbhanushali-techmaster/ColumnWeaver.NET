@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ColumnWeaver.NET feature reference: configurable .NET object-to-string schemas, property and formula columns, conditions, custom functions, fixed text, formatting, variables, and batch parsing.">
+  <link rel="canonical" href="https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/features.html">
+  <title>Features | ColumnWeaver.NET configurable .NET formatting</title>
+  <style>
+    :root { color-scheme:dark; --bg:#0b1020; --panel:#121a30; --line:#263452; --text:#edf4ff; --muted:#aab8d2; --cyan:#58d8ed }
+    * { box-sizing:border-box }
+    body { margin:0; background:var(--bg); color:var(--text); font:16px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif }
+    main { width:min(900px,calc(100% - 36px)); margin:40px auto 72px }
+    a { color:var(--cyan) }
+    h1 { font-size:clamp(2rem,5vw,3.5rem); line-height:1.12 }
+    h2 { margin-top:38px; padding-top:22px; border-top:1px solid var(--line); font-size:1.55rem }
+    p,li { color:var(--muted) }
+    code { color:#d9e9ff }
+    .callout { padding:18px 20px; background:var(--panel); border:1px solid var(--line); border-radius:12px }
+  </style>
+</head>
+<body>
+<main>
+  <nav><a href="./">ColumnWeaver.NET home</a> · <a href="questions.html">Common questions</a> · <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET">GitHub source</a></nav>
+  <h1>ColumnWeaver.NET feature reference</h1>
+  <p class="callout">ColumnWeaver.NET lets a .NET application reuse one object-to-string transformation engine while client, product, or integration output layouts are defined as separate schemas. The package targets .NET Framework 4.8 and .NET Standard 2.0. The Windows Forms configurator targets .NET Framework 4.8.</p>
+
+  <h2>Column types</h2>
+  <ul>
+    <li><strong>Property:</strong> reads flat or nested properties from an input object.</li>
+    <li><strong>Formula:</strong> computes values using supported expressions, earlier columns, and configuration variables.</li>
+    <li><strong>Conditional:</strong> selects a configured true or false value based on a condition.</li>
+    <li><strong>Custom function:</strong> invokes a named function registered by the consuming application.</li>
+    <li><strong>Fixed text:</strong> emits a constant label or token.</li>
+  </ul>
+
+  <h2>Shared output controls</h2>
+  <p>Columns can be ordered, enabled or disabled, named or aliased, and assigned a separator override. Shared value handling includes null policies, .NET format strings, casing, trimming, maximum length, prefixes, suffixes, configurable padding, and ordered literal or regular-expression replacement rules. Configurations also support a global separator and typed variables.</p>
+
+  <h2>Reusable execution and configuration</h2>
+  <p>Create a mutable client when configuration changes should be detected, or create/freeze a precompiled client for a stable schema. <code>ParseMany</code> processes forward-only enumerables incrementally. Configuration validation and JSON/XML serialization APIs are available in the library.</p>
+
+  <h2>Configurator scope</h2>
+  <p>The Windows Forms configurator edits columns and variables, supports JSON open/save, previews CLR sample objects using the compiled engine, and offers a separate JSON-input test sandbox. XML serialization is supported by the library API, but XML file open/save controls are not exposed in the current configurator. Preserving separator slots for disabled columns is also API-level and has no configurator control.</p>
+
+  <h2>Performance boundaries</h2>
+  <p>Compilation avoids repeating some schema work, but configured execution is not equivalent to a hand-written formatter. In the published workload-specific benchmarks, hard-coded C# is faster in several single-record cases. Review the <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.Benchmarks.ParserBenchmarks-report-github.md">full BenchmarkDotNet report</a> and benchmark the intended schema and production workload.</p>
+
+  <h2>Detailed source-verified inventory</h2>
+  <p>For option semantics, combinations, UI limits, and example configurations, read the <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/features.md">detailed feature inventory in the repository</a>. For a client-specific trading output example, see the <a href="questions.html">common questions</a> and linked worked example.</p>
+  <p><a href="https://www.nuget.org/packages/ColumnWeaver.NET/">ColumnWeaver.NET on NuGet</a> · <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET">Source repository on GitHub</a></p>
+</main>
+</body>
+</html>

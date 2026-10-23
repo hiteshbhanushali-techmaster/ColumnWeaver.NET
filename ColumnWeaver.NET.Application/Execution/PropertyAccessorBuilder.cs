@@ -14,6 +14,13 @@ namespace ColumnWeaver.NET.Application.Execution
         private static readonly ConcurrentDictionary<(Type, string), Func<object, object?>?> _cache
             = new ConcurrentDictionary<(Type, string), Func<object, object?>?>();
 
+        /// <summary>
+        /// Builds a strongly-typed LINQ <see cref="Expression"/> for accessing a simple or nested property path on a source expression.
+        /// </summary>
+        /// <param name="sourceType">The CLR type of the source object.</param>
+        /// <param name="path">The dot-delimited property path (e.g. "Customer.Address.City").</param>
+        /// <param name="sourceExpr">The parameter or expression representing the source object.</param>
+        /// <returns>A LINQ expression tree accessing the target property with null-propagation, or <c>null</c> if resolution fails.</returns>
         public static Expression? BuildPropertyExpression(Type sourceType, string path, Expression sourceExpr)
         {
             if (sourceType == null || string.IsNullOrWhiteSpace(path) || sourceExpr == null) return null;
@@ -83,6 +90,12 @@ namespace ColumnWeaver.NET.Application.Execution
             }
         }
 
+        /// <summary>
+        /// Compiles and caches a property getter delegate for the specified source type and property path.
+        /// </summary>
+        /// <param name="sourceType">The CLR type of the source object.</param>
+        /// <param name="path">The dot-delimited property path.</param>
+        /// <returns>A compiled getter delegate, or <c>null</c> if resolution fails.</returns>
         public static Func<object, object?>? BuildGetter(Type sourceType, string path)
         {
             if (sourceType == null || string.IsNullOrWhiteSpace(path)) return null;

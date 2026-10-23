@@ -36,17 +36,43 @@ namespace ColumnWeaver.NET.Application.Execution
         //  Identity
         // -----------------------------------------------------------------
 
+        /// <summary>
+        /// Gets the unique identifier of the original column definition.
+        /// </summary>
         public Guid ColumnId { get; }
+
+        /// <summary>
+        /// Gets the display name of the column.
+        /// </summary>
         public string ColumnName { get; }
+
+        /// <summary>
+        /// Gets the zero-based index of this node in the plan.
+        /// </summary>
         public int ColumnIndex { get; }
 
         // -----------------------------------------------------------------
         //  Configuration
         // -----------------------------------------------------------------
 
+        /// <summary>
+        /// Gets a value indicating whether this column is enabled for output.
+        /// </summary>
         public bool IsEnabled { get; }
+
+        /// <summary>
+        /// Gets the resolved output CLR type produced by this column.
+        /// </summary>
         public Type OutputType { get; }
+
+        /// <summary>
+        /// Gets the column-specific separator override string, or <c>null</c> to use the global separator.
+        /// </summary>
         public string? SeparatorOverride { get; }
+
+        /// <summary>
+        /// Gets the format string applied to the raw value of this column, or <c>null</c>.
+        /// </summary>
         public string? FormatString { get; }
 
         /// <summary>
@@ -117,11 +143,34 @@ namespace ColumnWeaver.NET.Application.Execution
     /// </summary>
     public enum ColumnKind
     {
+        /// <summary>
+        /// Unknown or unclassified column kind.
+        /// </summary>
         Unknown = 0,
+
+        /// <summary>
+        /// Fixed text or literal column value.
+        /// </summary>
         FixedText = 1,
+
+        /// <summary>
+        /// Model property accessor column.
+        /// </summary>
         Property = 2,
+
+        /// <summary>
+        /// Dynamic expression or formula column.
+        /// </summary>
         Formula = 3,
+
+        /// <summary>
+        /// Conditional branch column.
+        /// </summary>
         Conditional = 4,
+
+        /// <summary>
+        /// Custom registered function invocation column.
+        /// </summary>
         CustomFunction = 5
     }
 }

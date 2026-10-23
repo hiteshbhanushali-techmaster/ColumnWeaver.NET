@@ -11,8 +11,21 @@ using ColumnWeaver.NET.Core.ParserConfiguration;
 
 namespace ColumnWeaver.NET.Application.Validation
 {
+    /// <summary>
+    /// Provides static validation methods for <see cref="ParserConfiguration"/> instances,
+    /// verifying column definitions, variable bindings, dependencies, and expressions.
+    /// </summary>
     public static class ConfigurationValidator
     {
+        /// <summary>
+        /// Validates a <see cref="ParserConfiguration"/> against optional source type, resolver, engine, and function registry instances.
+        /// </summary>
+        /// <param name="config">The parser configuration to validate. Must not be null.</param>
+        /// <param name="sourceType">The optional source input type for property path checking.</param>
+        /// <param name="resolver">The optional property resolver to check property paths.</param>
+        /// <param name="engine">The optional expression engine to validate syntax.</param>
+        /// <param name="registry">The optional custom function registry to check registered functions.</param>
+        /// <returns>A <see cref="ValidationResult"/> containing errors, warnings, and informational diagnostics.</returns>
         public static ValidationResult Validate(
             ParserConfiguration      config,
             Type?                    sourceType,

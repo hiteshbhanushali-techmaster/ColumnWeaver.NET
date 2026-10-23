@@ -62,8 +62,17 @@ namespace ColumnWeaver.NET.Application.Engine
         [ThreadStatic]
         private static bool _threadContextInUse;
 
+        /// <summary>
+        /// Gets or sets the execution options governing parser execution, such as timeouts, debug mode, and cancellation.
+        /// </summary>
         public ExecutionOptions Options { get; set; } = ExecutionOptions.Default;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompiledParserEngine"/> class.
+        /// </summary>
+        /// <param name="resolver">The property resolver used to resolve model properties.</param>
+        /// <param name="engine">The expression engine used to evaluate dynamic formulas and conditions.</param>
+        /// <param name="registry">The optional custom function registry for user-defined function columns.</param>
         public CompiledParserEngine(
             IPropertyResolver         resolver,
             IExpressionEngine        engine,
@@ -73,6 +82,13 @@ namespace ColumnWeaver.NET.Application.Engine
             _planCache  = new ExecutionPlanCache();
         }
 
+        /// <summary>
+        /// Parses a single source object according to the specified configuration.
+        /// </summary>
+        /// <param name="config">The configuration defining columns, rules, and layout.</param>
+        /// <param name="source">The input source object to extract and format data from.</param>
+        /// <param name="sourceType">The explicit source type, or <c>null</c> to infer from <paramref name="source"/>.</param>
+        /// <returns>The assembled formatted output string.</returns>
         public string Parse(
             ParserConfiguration config,
             object?             source,
@@ -137,6 +153,14 @@ namespace ColumnWeaver.NET.Application.Engine
             return ExecuteAndAssemble(plan, context, Options, source);
         }
 
+        /// <summary>
+        /// Parses a source object with full diagnostic execution tracing enabled.
+        /// </summary>
+        /// <param name="config">The configuration defining columns, rules, and layout.</param>
+        /// <param name="source">The input source object to parse.</param>
+        /// <param name="sourceType">The explicit source type, or <c>null</c> to infer from <paramref name="source"/>.</param>
+        /// <param name="trace">When this method returns, contains detailed execution timings and per-column records.</param>
+        /// <returns>The assembled formatted output string.</returns>
         public string ParseWithTrace(
             ParserConfiguration  config,
             object?               source,
@@ -152,12 +176,26 @@ namespace ColumnWeaver.NET.Application.Engine
             return trace.FinalOutput ?? string.Empty;
         }
 
+        /// <summary>
+        /// Validates a configuration structurally without resolving properties or compiling expressions.
+        /// </summary>
+        /// <param name="config">The configuration to validate.</param>
+        /// <param name="sourceType">The optional source type to validate against.</param>
+        /// <returns>A <see cref="ValidationResult"/> indicating validity and listing any errors or warnings.</returns>
         public ValidationResult Validate(ParserConfiguration config, Type? sourceType = null)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
             return ConfigurationValidator.Validate(config, sourceType, null, null, null);
         }
 
+        /// <summary>
+        /// Fully validates a configuration including property resolution and expression syntax checking.
+        /// </summary>
+        /// <param name="config">The configuration to validate.</param>
+        /// <param name="resolver">The property resolver to check property paths.</param>
+        /// <param name="engine">The expression engine to check formula and condition syntax.</param>
+        /// <param name="sourceType">The optional source type to validate against.</param>
+        /// <returns>A <see cref="ValidationResult"/> indicating validity and listing any errors or warnings.</returns>
         public ValidationResult ValidateFull(
             ParserConfiguration config,
             IPropertyResolver   resolver,
@@ -171,6 +209,13 @@ namespace ColumnWeaver.NET.Application.Engine
             return ConfigurationValidator.Validate(config, sourceType, resolver, engine, null);
         }
 
+        /// <summary>
+        /// Parses a sequence of input objects streaming the resulting formatted strings.
+        /// </summary>
+        /// <param name="config">The configuration defining columns, rules, and layout.</param>
+        /// <param name="inputs">The sequence of input objects to parse.</param>
+        /// <param name="sourceType">The optional source type, or <c>null</c> to infer per item.</param>
+        /// <returns>An enumerable of formatted row strings.</returns>
         public IEnumerable<string> ParseMany(
             ParserConfiguration  config,
             IEnumerable<object?> inputs,

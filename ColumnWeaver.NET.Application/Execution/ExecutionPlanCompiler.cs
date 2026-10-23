@@ -50,6 +50,12 @@ namespace ColumnWeaver.NET.Application.Execution
         private readonly NullHandler                    _nullHandler;
         private readonly ReplacementApplicator          _replacementApplicator;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionPlanCompiler"/> class.
+        /// </summary>
+        /// <param name="resolver">The property resolver used for property columns.</param>
+        /// <param name="engine">The expression engine used for dynamic formulas and conditions.</param>
+        /// <param name="registry">The optional custom function registry.</param>
         public ExecutionPlanCompiler(
             IPropertyResolver         resolver,
             IExpressionEngine        engine,
@@ -63,6 +69,13 @@ namespace ColumnWeaver.NET.Application.Execution
             _replacementApplicator = new ReplacementApplicator();
         }
 
+        /// <summary>
+        /// Compiles the specified configuration into an executable <see cref="ExecutionPlan"/>.
+        /// </summary>
+        /// <param name="config">The parser configuration to compile.</param>
+        /// <param name="sourceType">The optional source input type.</param>
+        /// <returns>A compiled <see cref="ExecutionPlan"/>.</returns>
+        /// <exception cref="AggregateValidationException">Thrown if configuration validation fails with errors.</exception>
         public ExecutionPlan Compile(ParserConfiguration config, Type? sourceType = null)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -616,7 +629,7 @@ namespace ColumnWeaver.NET.Application.Execution
             Type                            outputType,
             Core.Models.NullHandlingConfig  nullHandling,
             Core.Models.FormattingOptions   formatting,
-            IList<Core.Models.ReplacementRule> replacementRules)
+            IList<Core.Models.ReplacementRule>? replacementRules)
         {
             var nullHandler            = _nullHandler;
             var formatter              = _formatter;

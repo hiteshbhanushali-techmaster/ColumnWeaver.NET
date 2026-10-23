@@ -15,12 +15,12 @@
     <Version>1.0.0-beta</Version>
     <PackageVersion>1.0.0-beta</PackageVersion>
     <Authors>Hitesh Bhanushali</Authors>
-    <PackageProjectUrl>https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET</PackageProjectUrl>
+    <PackageProjectUrl>https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageTags>ColumnWeaver.NET;client-specific-formatting;configurable-data-export;object-to-string;string-formatting;data-transformation;delimited-export;fixed-width;financial;trading;formula-evaluator;conditional-mapping;custom-functions;JSON-configuration;XML-configuration;batch-processing;net48;netstandard20</PackageTags>
+    <PackageTags>ColumnWeaver.NET;client-specific-formatting;customer-specific-formatting;configurable-data-export;object-to-string;object-to-text;string-formatting;data-transformation;delimited-export;fixed-width;fixed-width-records;financial;trading;trading-data;formula-columns;conditional-columns;custom-functions;JSON-configuration;XML-configuration;batch-processing;net48;netstandard20</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>columnweaver-icon.png</PackageIcon>
     <IncludeSymbols>false</IncludeSymbols>

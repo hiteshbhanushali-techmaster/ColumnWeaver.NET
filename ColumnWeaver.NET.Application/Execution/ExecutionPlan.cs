@@ -126,7 +126,7 @@ namespace ColumnWeaver.NET.Application.Execution
         /// <remarks>
         /// Call once per parse operation (or once per thread for concurrent use).
         /// In <c>ParseMany</c> scenarios, reuse the same context across iterations
-        /// by calling <see cref="ExecutionContext.Reset"/> instead of creating
+        /// by calling <see cref="ExecutionContext.Reset(object?)"/> instead of creating
         /// a new context per item.
         /// </remarks>
         public ExecutionContext CreateContext() => new ExecutionContext(TotalColumnCount, CompiledVariables, VariableIndexes);
