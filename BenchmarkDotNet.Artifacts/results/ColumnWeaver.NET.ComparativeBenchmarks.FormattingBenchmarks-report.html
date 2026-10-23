@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>ColumnWeaver.NET.ComparativeBenchmarks.FormattingBenchmarks-20261023-231935</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.13.12, Windows 11 (10.0.22000.2176/21H2/SunValley)
+Intel Core i7-10700F CPU 2.90GHz, 1 CPU, 16 logical and 8 physical cores
+.NET SDK 8.0.101
+  [Host]     : .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+  Job-WMRRIW : .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+</code></pre>
+<pre><code>Runtime=.NET 8.0  IterationCount=10  WarmupCount=5
+</code></pre>
+
+<table>
+<thead><tr><th>Method                          </th><th>Categories</th><th>Mean     </th><th>Error    </th><th>StdDev   </th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Gen1</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>&#39;ColumnWeaver ParseMany 10k&#39;</td><td>Batch 10k</td><td>3,376,841.4 ns</td><td>39,027.40 ns</td><td>23,224.58 ns</td><td>1.00</td><td>0.00</td><td>175.7813</td><td>-</td><td>1502234 B</td><td>1.00</td>
+</tr><tr><td>&#39;StringTokenFormatter loop 10k&#39;</td><td>Batch 10k</td><td>30,889,594.4 ns</td><td>655,743.48 ns</td><td>390,222.43 ns</td><td>9.15</td><td>0.15</td><td>6750.0000</td><td>31.2500</td><td>56529053 B</td><td>37.63</td>
+</tr><tr><td>&#39;TinyString loop 10k&#39;</td><td>Batch 10k</td><td>67,097,613.3 ns</td><td>3,626,831.06 ns</td><td>2,398,924.19 ns</td><td>19.94</td><td>0.62</td><td>9666.6667</td><td>-</td><td>82925973 B</td><td>55.20</td>
+</tr><tr><td>&#39;ColumnWeaver precompiled schema&#39;</td><td>Single row</td><td>244.7 ns</td><td>0.71 ns</td><td>0.42 ns</td><td>1.00</td><td>0.00</td><td>0.0153</td><td>-</td><td>128 B</td><td>1.00</td>
+</tr><tr><td>&#39;StringTokenFormatter parsed template&#39;</td><td>Single row</td><td>3,177.5 ns</td><td>116.23 ns</td><td>76.88 ns</td><td>13.00</td><td>0.32</td><td>0.6676</td><td>0.0038</td><td>5608 B</td><td>43.81</td>
+</tr><tr><td>&#39;TinyString fluent configuration&#39;</td><td>Single row</td><td>6,814.4 ns</td><td>119.56 ns</td><td>71.15 ns</td><td>27.84</td><td>0.31</td><td>1.0071</td><td>-</td><td>8632 B</td><td>67.44</td>
+</tr></tbody></table>
+</body>
+</html>

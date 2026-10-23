@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ColumnWeaver.NET\ColumnWeaver.NET.csproj" />
+    <ProjectReference Include="..\..\ColumnWeaver.NET.Core\ColumnWeaver.NET.Core.csproj" />
+    <ProjectReference Include="..\..\ColumnWeaver.NET.Application\ColumnWeaver.NET.Application.csproj" />
+    <ProjectReference Include="..\..\ColumnWeaver.NET.Infrastructure\ColumnWeaver.NET.Infrastructure.csproj" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
+    <PackageReference Include="StringTokenFormatter" Version="9.0.1" />
+    <PackageReference Include="TinyString" Version="1.1.0" />
+  </ItemGroup>
+</Project>

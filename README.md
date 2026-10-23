@@ -269,6 +269,17 @@ All implementations use identical input objects and are asserted in setup to pro
   - Standard mutable clients compute an allocation-free FNV-1a fingerprint from configuration content when retrieving a plan. This work grows with configuration size; the precompiled/frozen path avoids the per-record configuration scan for stable schemas. FNV-1a is non-cryptographic and has a theoretical collision risk.
 - **Limitations:** The suite benchmarks representative features and scenarios. Throughput in production will vary with complex object graphs, deep reflection hierarchies, and external garbage collection load.
 
+### Comparative object-to-string benchmark (.NET 8)
+
+The separate [comparative harness](benchmarks/ColumnWeaver.NET.ComparativeBenchmarks/README.md) compares ColumnWeaver.NET with StringTokenFormatter 9.0.1 and TinyString 1.1.0. All three produce the same delimited five-field trade row, verified before timing. It measures both one row and 10,000 rows on Windows 11, an Intel Core i7-10700F, and .NET 8.0.1. Schema and template setup are excluded; rendering and output allocations are included.
+
+| Workload | ColumnWeaver | StringTokenFormatter | TinyString |
+|---|---:|---:|---:|
+| One record | 244.7 ns · 128 B | 3,177.5 ns · 5,608 B (13.00× time) | 6,814.4 ns · 8,632 B (27.84× time) |
+| 10,000 records | 3.377 ms · 1.50 MB | 30.890 ms · 56.53 MB (9.15× time) | 67.098 ms · 82.93 MB (19.94× time) |
+
+These are measured results for this workload and API usage, not a universal performance claim. See the [full report](BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.ComparativeBenchmarks.FormattingBenchmarks-report-github.md), [CSV](BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.ComparativeBenchmarks.FormattingBenchmarks-report.csv), and [reproduction harness](benchmarks/ColumnWeaver.NET.ComparativeBenchmarks/Program.cs).
+
 ---
 
 ## Roadmap & Status
