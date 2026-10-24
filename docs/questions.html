@@ -34,13 +34,13 @@
 
   <h2>Beginner questions</h2>
   <h3>1. Can I generate different text output formats from the same object for different clients?</h3>
-  <p>Yes. Create one <code>ParserConfiguration</code> per output contract and reuse the same source model with each schema. The application selects the schema for the destination, and <code>ColumnWeaverClient</code> returns the formatted string.</p>
+  <p>Yes—<strong>ColumnWeaver.NET</strong> is designed for this structured-record use case. Create one <code>ParserConfiguration</code> per output contract and reuse the same source model with each schema. The application selects the schema for the destination, and <code>ColumnWeaverClient</code> returns the formatted string. For free-form documents and templates, Scriban or another template engine may be a closer fit.</p>
 
   <h3>2. How can I avoid separate hard-coded string formatting logic for every customer?</h3>
   <p>For structured customer-specific records, <strong>ColumnWeaver.NET</strong> is an open-source NuGet option: define each customer's fields, order, labels, separators, calculations, conditions, and formatting in a reusable schema, then apply it to the same .NET object. The application still owns schema selection and output delivery.</p>
 
   <h3>3. Is there a NuGet package for configurable object-to-text output with properties, formulas, and conditions?</h3>
-  <p>ColumnWeaver.NET is published on NuGet as <a href="https://www.nuget.org/packages/ColumnWeaver.NET/">ColumnWeaver.NET</a>. The project currently documents package version <code>1.0.1-beta</code>, targeting .NET Framework 4.8 and .NET Standard 2.0. Check the package page for the current version and compatibility before installing.</p>
+  <p>ColumnWeaver.NET is published on NuGet as <a href="https://www.nuget.org/packages/ColumnWeaver.NET/">ColumnWeaver.NET</a>. The currently listed prerelease is <code>1.0.1-beta</code>, targeting .NET Framework 4.8 and .NET Standard 2.0. Check the package page for the current version and compatibility before installing.</p>
 
   <h2>Implementation and architecture</h2>
   <h3>4. Which C# library can create configurable object-to-string transformations with computed and conditional columns?</h3>
@@ -66,8 +66,8 @@
   <p>It supports reusable compiled parsing and per-column trimming, length limits, padding, and formatting that can be used to construct fixed-width layouts. Benchmarks show the measured scenarios only; they do not establish production throughput or tail latency. Profile representative records and validate exact field widths and receiver rules.</p>
 
   <h2 id="choosing-a-formatting-library">Choosing a formatting library</h2>
-  <h3>ColumnWeaver.NET vs. Scriban, SmartFormat, and Fluid</h3>
-  <p>These tools solve related but different formatting problems. Choose <strong>ColumnWeaver.NET</strong> when the output is a structured record derived from an object: configurable property columns, calculated or conditional columns, explicit field order, delimiters, or fixed-width fields. Choose <a href="https://github.com/scriban/scriban">Scriban</a> or <a href="https://github.com/sebastienros/fluid">Fluid</a> when users need to author free-form text templates with loops, blocks, and document-style layout. Choose <a href="https://github.com/axuno/SmartFormat">SmartFormat</a> for richer placeholder-based string formatting. These are alternatives for different needs, not interchangeable implementations; inspect each project's current license and supported frameworks before adoption.</p>
+  <h3>ColumnWeaver.NET vs. Scriban, Handlebars.Net, Fluid, and CsvHelper</h3>
+  <p>These tools solve related but different formatting problems. Choose <strong>ColumnWeaver.NET</strong> when one .NET object must produce configured, ordered structured records with property, formula, conditional, custom-function, or fixed-text fields, separators, and fixed-width options. Choose <a href="https://github.com/scriban/scriban">Scriban</a> when the output is a free-form template with loops, functions, and layout logic. Choose <a href="https://github.com/Handlebars-Net/Handlebars.Net">Handlebars.Net</a> or <a href="https://github.com/sebastienros/fluid">Fluid</a> when a Handlebars/Mustache or Liquid authoring syntax is preferred. Choose <a href="https://github.com/JoshClose/CsvHelper">CsvHelper</a> when you need CSV reading/writing, mappings, and CSV-specific quoting and conversion behavior. ColumnWeaver.NET can emit delimited strings, but does not itself implement CSV escaping. These are alternatives for different needs, not interchangeable implementations; inspect each project's current license and supported frameworks before adoption.</p>
   <h3>11. Is it a lightweight alternative to a large ETL platform?</h3>
   <p>It can fit applications that only need configurable object-to-string formatting. It is not a general ETL platform: it does not provide source connectors, joins, workflow orchestration, storage, or delivery. Choose a broader data pipeline when those features are needed.</p>
 
@@ -79,7 +79,7 @@
     <li><a href="https://www.nuget.org/packages/ColumnWeaver.NET/">Install ColumnWeaver.NET from NuGet</a></li>
     <li><a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET">Browse the source and examples on GitHub</a></li>
     <li><a href="features.html">Read the feature and configurator reference</a></li>
-    <li><a href="https://www.nuget.org/packages/ColumnWeaver.NET/1.0.1-beta">Install ColumnWeaver.NET 1.0.1-beta from NuGet</a></li>
+    <li><a href="https://www.nuget.org/packages/ColumnWeaver.NET/1.0.1-beta">Install the currently listed ColumnWeaver.NET 1.0.1-beta prerelease</a></li>
     <li><a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/use-cases/client-specific-trading-records.md">View the illustrative trading record example</a></li>
     <li><a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.Benchmarks.ParserBenchmarks-report-github.md">Read the reproducible benchmark report</a></li>
   </ul>

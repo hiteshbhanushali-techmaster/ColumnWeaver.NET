@@ -10,17 +10,18 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Company>ColumnWeaver</Company>
     <Product>ColumnWeaver.NET</Product>
-    <Description>Client-specific object-to-string formatting for .NET Framework 4.8 and .NET Standard 2.0 (compatible with modern .NET 6/8/9+). Reuse one transformation engine across products and customers with configurable columns, formulas, conditions, variables, separators, fixed-width output, null rules, replacements, JSON/XML schemas, and streaming batches.</Description>
+    <Description>Configurable object-to-record formatting for .NET Framework 4.8 and modern .NET. Reuse one schema-driven engine across customers with property, formula, conditional, custom-function, and fixed-text columns, separators, fixed-width rules, and JSON/XML configuration.</Description>
     <PackageTitle>ColumnWeaver.NET</PackageTitle>
-    <Version>1.0.1-beta</Version>
-    <PackageVersion>1.0.1-beta</PackageVersion>
+    <Version>1.0.2-beta</Version>
+    <PackageVersion>1.0.2-beta</PackageVersion>
     <Authors>Hitesh Bhanushali</Authors>
     <PackageProjectUrl>https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageTags>ColumnWeaver.NET;client-specific-formatting;customer-specific-formatting;configurable-data-export;object-to-string;object-to-text;string-formatting;data-transformation;delimited-export;fixed-width;fixed-width-records;financial;trading;trading-data;formula-columns;conditional-columns;custom-functions;JSON-configuration;XML-configuration;batch-processing;net48;netstandard20</PackageTags>
+    <PackageTags>ColumnWeaver.NET;client-specific-formatting;customer-specific-formatting;configurable-data-export;object-to-string;object-to-record;schema-driven-formatting;structured-records;string-formatting;data-transformation;delimited-export;fixed-width;fixed-width-records;financial;trading;trading-data;formula-columns;conditional-columns;custom-functions;JSON-configuration;XML-configuration;batch-processing;net48;netstandard20</PackageTags>
+    <PackageReleaseNotes>Clarifies when ColumnWeaver.NET fits schema-driven structured records compared with general template engines and CSV libraries. No runtime API changes.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>columnweaver-icon.png</PackageIcon>
     <IncludeSymbols>false</IncludeSymbols>

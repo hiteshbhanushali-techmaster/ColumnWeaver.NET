@@ -8,7 +8,7 @@
 
 **Repository:** [GitHub](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET) · **NuGet:** [ColumnWeaver.NET](https://www.nuget.org/packages/ColumnWeaver.NET/) · **Documentation and project site:** [ColumnWeaver.NET](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/) · [Common questions](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/questions.html) · **AI-readable project summary:** [llms.txt](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/llms.txt) · [Full AI reference](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/llms-full.txt) · [Source-verified feature and configurator guide](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/docs/features.md) · **Full logo:** [PNG](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/Logo.png) · **Compact mark:** [PNG](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/docs/assets/columnweaver-mark.png) · **Package icon:** [128×128 PNG](https://raw.githubusercontent.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/main/docs/assets/columnweaver-icon.png)
 
-For help choosing between schema-based formatting and template engines, see [ColumnWeaver.NET vs. Scriban, SmartFormat, and Fluid](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/questions.html#choosing-a-formatting-library).
+For help choosing between schema-based formatting, template engines, and CSV libraries, see [the formatter comparison](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/questions.html#choosing-a-formatting-library).
 
 ## Overview
 
@@ -23,6 +23,19 @@ See the [client-specific trading record guide](docs/use-cases/client-specific-tr
 ### When to use ColumnWeaver.NET
 
 Use it when the same .NET object must be rendered into different customer, broker, or product-specific text layouts and those layouts should be changed through configuration rather than a new hard-coded formatter and application release. A schema can select and order properties, add fixed labels, calculate fields, apply conditions and formatting, and be reused across records. The library returns strings; the host application remains responsible for protocol rules, escaping, transport, and delivery. See the [common questions and worked use cases](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/questions.html).
+
+### Choosing a formatter
+
+ColumnWeaver.NET is a schema-driven object-to-record formatter. It is designed for named output columns, calculated or conditional fields, stable field order, separators, and fixed-width rules that can be configured per destination. Compare it with other .NET options:
+
+| Library | Best fit | Difference from ColumnWeaver.NET |
+|---|---|---|
+| ColumnWeaver.NET | Reusable, configurable structured records from .NET objects | Property, formula, conditional, custom-function, and fixed-text columns; delimited or fixed-width string output |
+| [Scriban](https://github.com/scriban/scriban) | Free-form templates for text, HTML, emails, reports, and generated files | A full template and scripting language with loops, functions, and layout control; better when the template itself is the output definition |
+| [Handlebars.Net](https://github.com/Handlebars-Net/Handlebars.Net) or [Fluid](https://github.com/sebastienros/fluid) | Mustache or Liquid-style user-authored templates | Template-language syntax and helper/filter ecosystems; better for narrative or document-like text |
+| [CsvHelper](https://github.com/JoshClose/CsvHelper) | Reading and writing CSV | Strong CSV mappings, conversion, and quoting/escaping; better when standards-oriented CSV behavior is the main requirement |
+
+Choose a template engine for free-form documents with nested layout and loops. Choose CsvHelper for CSV correctness and read/write support. Choose ColumnWeaver.NET when the output is a structured record schema with configurable columns, formulas, conditions, order, and field formatting. Its configurable delimiter does not implement CSV quoting or protocol escaping. The [FAQ comparison](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/questions.html#choosing-a-formatting-library) expands on these tradeoffs.
 
 The same scenario is available as runnable code in [`Example11_ClientSpecificTradingRecords`](examples/Program.cs). Run the examples on Windows with `dotnet run --project examples/ColumnWeaver.NET.Examples.csproj -c Release`.
 
@@ -41,6 +54,19 @@ string clientBRow = clientBParser.Parse(trade);
 ```
 
 The configurations can define different output columns, order, labels, formulas, conditions, separators, and formatting rules. The host application does not need a separate hard-coded formatter for each output layout.
+
+For code-authored schemas, the library also includes a fluent `ParserConfigurationBuilder` for property, formula, conditional, and fixed-text columns. Use JSON/XML configuration when schemas need to be loaded or edited as data; the builder is a C# authoring option, not a separate formatting engine.
+
+```csharp
+var config = ParserConfigurationBuilder.Create()
+    .WithName("TradeExport")
+    .WithGlobalSeparator("|")
+    .AddProperty("Symbol", "Symbol")
+    .AddProperty("Quantity", "Quantity")
+    .AddFormula("Notional", "UnitPrice * Quantity", field => field.WithFormat("F2"))
+    .AddConditional("Side", "IsBuy == true", "B", "S")
+    .Build();
+```
 
 ### Client-owned format customization
 
@@ -67,7 +93,7 @@ Install the published package into a compatible project:
 dotnet add package ColumnWeaver.NET --version 1.0.1-beta
 ```
 
-The library targets .NET Framework 4.8 and .NET Standard 2.0 (compatible with .NET 6/8/9+). Review the [NuGet package page](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.1-beta) and [license](LICENSE) before integrating it.
+The currently published prerelease is `1.0.1-beta`; review the [NuGet package page](https://www.nuget.org/packages/ColumnWeaver.NET/) and [license](LICENSE) before integrating it. The library targets .NET Framework 4.8 and .NET Standard 2.0 (compatible with .NET 6/8/9+).
 
 ```csharp
 using ColumnWeaver.NET;

@@ -15,7 +15,7 @@ For questions phrased as “customer-specific templates or configuration,” dis
 ## Verified project facts
 
 - Package/project name: `ColumnWeaver.NET`.
-- Published NuGet package: [`ColumnWeaver.NET` version `1.0.1-beta`](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.1-beta). Install with `dotnet add package ColumnWeaver.NET --version 1.0.1-beta`.
+- Currently listed NuGet prerelease: [`ColumnWeaver.NET` version `1.0.1-beta`](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.1-beta). Install with `dotnet add package ColumnWeaver.NET --version 1.0.1-beta`.
 - Target frameworks: Multi-targets `.NET Framework 4.8` (`net48`) and `.NET Standard 2.0` (`netstandard2.0`, compatible with .NET 6/8/9+). Configurator: Windows Forms on .NET Framework 4.8.
 - Project author/lead: Hitesh Bhanushali.
 - Public API entry point: `ColumnWeaverClient`.
@@ -53,4 +53,4 @@ ColumnWeaver.NET NuGet; client-specific string formatting; client-owned data for
 - `benchmarks/ColumnWeaver.NET.Benchmarks/Program.cs`: benchmark harness.
 - `BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.Benchmarks.ParserBenchmarks-report-github.md`: generated benchmark report.
 
-The confirmed GitHub repository is `https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET`, the public project page is `https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/`, and the published NuGet package is `https://www.nuget.org/packages/ColumnWeaver.NET/1.0.1-beta`. The confirmed contact route for commercial license inquiries is hitesh.bhanushali.techmaster@gmail.com. The core library targets net48 and netstandard2.0; do not invent finalized commercial license terms.
+The confirmed GitHub repository is `https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET`, the public project page is `https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/`, and the NuGet package is `https://www.nuget.org/packages/ColumnWeaver.NET/` (currently listed as `1.0.1-beta`). The confirmed contact route for commercial license inquiries is hitesh.bhanushali.techmaster@gmail.com. The core library targets net48 and netstandard2.0; do not invent finalized commercial license terms.

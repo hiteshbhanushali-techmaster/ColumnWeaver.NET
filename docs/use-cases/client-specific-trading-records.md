@@ -145,6 +145,6 @@ How to format trading records differently for each client in .NET; reusable clie
 ## Project links
 
 - [GitHub repository](https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET)
-- [ColumnWeaver.NET on NuGet](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.1-beta)
+- [ColumnWeaver.NET 1.0.1-beta on NuGet](https://www.nuget.org/packages/ColumnWeaver.NET/1.0.1-beta)
 - [Project overview and configurator demo](https://hiteshbhanushali-techmaster.github.io/ColumnWeaver.NET/)
 - [Complete feature reference](../features.md)
