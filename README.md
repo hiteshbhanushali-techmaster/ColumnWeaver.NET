@@ -299,14 +299,9 @@ All implementations use identical input objects and are asserted in setup to pro
 
 ### Comparative object-to-string benchmark (.NET 8)
 
-The separate [comparative harness](benchmarks/ColumnWeaver.NET.ComparativeBenchmarks/README.md) compares ColumnWeaver.NET with StringTokenFormatter 9.0.1 and TinyString 1.1.0. All three produce the same delimited five-field trade row, verified before timing. It measures both one row and 10,000 rows on Windows 11, an Intel Core i7-10700F, and .NET 8.0.1. Schema and template setup are excluded; rendering and output allocations are included.
+The [comparative harness and evaluation](benchmarks/ColumnWeaver.NET.ComparativeBenchmarks/README.md) now includes Scriban, SmartFormat, Handlebars.Net, Fluid, StringTokenFormatter, and TinyString. All seven implementations passed exact single-row and 10,000-row output checks before timing. On this five-field structured record, ColumnWeaver took **250 ns / 128 B** for one row and **3.348 ms / 1.50 MB** for 10,000 rows. The closest external alternatives in this workload were Handlebars.Net (**706 ns**, **8.182 ms**) and Fluid (**890 ns**, **8.993 ms**). Template engines provide free-form authoring and related features not measured by this schema workload; see the comparison for fit, capabilities, methodology, and limitations.
 
-| Workload | ColumnWeaver | StringTokenFormatter | TinyString |
-|---|---:|---:|---:|
-| One record | 244.7 ns · 128 B | 3,177.5 ns · 5,608 B (13.00× time) | 6,814.4 ns · 8,632 B (27.84× time) |
-| 10,000 records | 3.377 ms · 1.50 MB | 30.890 ms · 56.53 MB (9.15× time) | 67.098 ms · 82.93 MB (19.94× time) |
-
-These are measured results for this workload and API usage, not a universal performance claim. See the [full report](BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.ComparativeBenchmarks.FormattingBenchmarks-report-github.md), [CSV](BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.ComparativeBenchmarks.FormattingBenchmarks-report.csv), and [reproduction harness](benchmarks/ColumnWeaver.NET.ComparativeBenchmarks/Program.cs).
+BenchmarkDotNet 0.13.12 on Windows 11 / .NET 8.0.1 did not identify the processor and could not set the power plan. Treat these measurements as an indicative run and repeat on a controlled host for adoption decisions. See the [full report](BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.ComparativeBenchmarks.FormattingBenchmarks-report-github.md), [CSV](BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.ComparativeBenchmarks.FormattingBenchmarks-report.csv), and [harness](benchmarks/ColumnWeaver.NET.ComparativeBenchmarks/Program.cs).
 
 ---
 

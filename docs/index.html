@@ -162,15 +162,18 @@
       <p class="note" style="margin-top:18px">Hard-coded C# remains faster in several individual scenarios. The benchmark demonstrates the cost of configurable execution for these measured schemas; it does not establish performance for every application, data shape, or tail-latency requirement. See the full BenchmarkDotNet report and harness in the repository.</p>
       <p>Reproduce with: <code>dotnet run --project benchmarks/ColumnWeaver.NET.Benchmarks/ColumnWeaver.NET.Benchmarks.csproj -c Release -- --bdn</code>. See the <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.Benchmarks.ParserBenchmarks-report-github.md">full BenchmarkDotNet report</a> and <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/benchmarks/ColumnWeaver.NET.Benchmarks/Program.cs">benchmark harness</a>.</p>
       <h3>Matched object-to-string comparison (.NET 8)</h3>
-      <p>All three libraries rendered the same five-field trade row; setup and output equality checks ran outside the timed methods. The precompiled ColumnWeaver schema measured 244.7 ns and 128 B per row, versus 3,177.5 ns and 5,608 B for StringTokenFormatter 9.0.1, and 6,814.4 ns and 8,632 B for TinyString 1.1.0.</p>
+      <p>All seven implementations produced identical output for a five-field trade record. ColumnWeaver.NET measured 250 ns / 128 B per row and 3.348 ms / 1.50 MB for 10,000 rows. The closest tested template engines were Handlebars.Net (706 ns / 200 B; 8.182 ms / 2.45 MB per 10,000 rows) and Fluid (890 ns / 688 B; 8.993 ms / 7.18 MB). Scriban, SmartFormat, StringTokenFormatter, and TinyString are also included in the report.</p>
       <div class="table-scroll" style="margin-top:18px"><table>
-        <thead><tr><th>Workload</th><th>ColumnWeaver</th><th>StringTokenFormatter</th><th>TinyString</th></tr></thead>
+        <thead><tr><th>Implementation</th><th>One record</th><th>10,000 records</th></tr></thead>
         <tbody>
-          <tr><td>One record</td><td>244.7 ns · 128 B</td><td>3,177.5 ns · 5,608 B · 13.00× time</td><td>6,814.4 ns · 8,632 B · 27.84× time</td></tr>
-          <tr><td>10,000 records</td><td>3.377 ms · 1.50 MB</td><td>30.890 ms · 56.53 MB · 9.15× time</td><td>67.098 ms · 82.93 MB · 19.94× time</td></tr>
+          <tr><td>ColumnWeaver.NET</td><td>250 ns · 128 B</td><td>3.348 ms · 1.50 MB</td></tr>
+          <tr><td>Handlebars.Net 2.4.3</td><td>706 ns · 200 B</td><td>8.182 ms · 2.45 MB</td></tr>
+          <tr><td>Fluid.Core 2.40.0</td><td>890 ns · 688 B</td><td>8.993 ms · 7.18 MB</td></tr>
+          <tr><td>Scriban 7.5.3</td><td>2.327 µs · 520 B</td><td>24.360 ms · 5.65 MB</td></tr>
+          <tr><td>SmartFormat 3.6.1</td><td>3.316 µs · 1.06 KB</td><td>34.662 ms · 11.02 MB</td></tr>
         </tbody>
       </table></div>
-      <p class="note" style="margin-top:18px">The comparisons reflect this record shape and repeated-use APIs, not all formatting tasks. ColumnWeaver compiled its schema once, StringTokenFormatter parsed its template once, and TinyString applied its fluent call-site options per call. Review the <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.ComparativeBenchmarks.FormattingBenchmarks-report-github.md">full comparative report</a> and <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/benchmarks/ColumnWeaver.NET.ComparativeBenchmarks/Program.cs">reproducible harness</a>.</p>
+      <p class="note" style="margin-top:18px">These results apply to this workload and repeated-use API setup. A template engine may be the better fit for free-form documents, emails, and user-authored layouts. BenchmarkDotNet could not identify the CPU or set the Windows power plan, so repeat the run on a controlled machine before relying on small differences. Read the <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/benchmarks/ColumnWeaver.NET.ComparativeBenchmarks/README.md">capability and adoption comparison</a>, <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/BenchmarkDotNet.Artifacts/results/ColumnWeaver.NET.ComparativeBenchmarks.FormattingBenchmarks-report-github.md">full comparative report</a>, and <a href="https://github.com/hiteshbhanushali-techmaster/ColumnWeaver.NET/blob/main/benchmarks/ColumnWeaver.NET.ComparativeBenchmarks/Program.cs">reproducible harness</a>.</p>
     </section>
     <section id="quickstart">
       <div class="eyebrow">Quick start</div><h2>Define columns, then reuse the client</h2>

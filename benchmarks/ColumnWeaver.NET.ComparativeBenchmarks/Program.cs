@@ -8,6 +8,13 @@ using ColumnWeaver.NET.Core.Columns;
 using ColumnWeaver.NET.Core.Enums;
 using ColumnWeaver.NET.Core.Models;
 using ColumnWeaver.NET.Core.ParserConfiguration;
+using Fluid;
+using Fluid.Values;
+using HandlebarsDotNet;
+using Scriban;
+using Scriban.Runtime;
+using SmartFormat;
+using SmartFormat.Core.Parsing;
 using StringTokenFormatter;
 using TinyString;
 
@@ -35,6 +42,14 @@ public class FormattingBenchmarks
     private ColumnWeaverClient _columnWeaver = null!;
     private InterpolatedStringResolver _tokenResolver = null!;
     private Func<TradeRecord, string> _renderTokenTemplate = null!;
+    private Scriban.Template _scribanTemplate = null!;
+    private Scriban.TemplateContext _scribanContext = null!;
+    private ScriptObject _scribanGlobals = null!;
+    private Func<TradeRecord, string> _renderHandlebarsTemplate = null!;
+    private IFluidTemplate _fluidTemplate = null!;
+    private TemplateOptions _fluidOptions = null!;
+    private SmartFormatter _smartFormatter = null!;
+    private Format _smartParsedTemplate = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -88,15 +103,61 @@ public class FormattingBenchmarks
         var parsedTemplate = _tokenResolver.Interpolate(Template);
         _renderTokenTemplate = row => _tokenResolver.FromObject(parsedTemplate, row);
 
+        _scribanGlobals = new ScriptObject();
+        _scribanGlobals.Import(typeof(ScribanFormattingFunctions));
+        _scribanGlobals.SetValue("trade", _sample, readOnly: false);
+        _scribanContext = new Scriban.TemplateContext();
+        _scribanContext.PushGlobal(_scribanGlobals);
+        _scribanTemplate = Scriban.Template.Parse(
+            "{{ trade.symbol }}|{{ trade.quantity }}|{{ format trade.unit_price \"F2\" }}|{{ if trade.is_buy }}B{{ else }}S{{ end }}|{{ format (trade.unit_price * trade.quantity) \"F2\" }}");
+        if (_scribanTemplate.HasErrors)
+            throw new InvalidOperationException("Scriban benchmark template failed to parse.");
+
+        var handlebars = Handlebars.Create();
+        handlebars.RegisterHelper("format", (output, _, arguments) =>
+        {
+            var value = Convert.ToDouble(arguments[0], CultureInfo.InvariantCulture);
+            var format = Convert.ToString(arguments[1], CultureInfo.InvariantCulture) ?? "F2";
+            output.WriteSafeString(value.ToString(format, CultureInfo.InvariantCulture));
+        });
+        var handlebarsTemplate = handlebars.Compile(
+            "{{Symbol}}|{{Quantity}}|{{format UnitPrice \"F2\"}}|{{#if IsBuy}}B{{else}}S{{/if}}|{{format Notional \"F2\"}}");
+        _renderHandlebarsTemplate = row => handlebarsTemplate(row);
+
+        var fluidParser = new FluidParser();
+        _fluidOptions = new TemplateOptions();
+        _fluidOptions.MemberAccessStrategy.Register<TradeRecord>();
+        _fluidOptions.Filters.AddFilter("format", (input, arguments, _) =>
+        {
+            var format = arguments.At(0).ToStringValue();
+            var number = input.ToNumberValue();
+            return new StringValue(number.ToString(format, CultureInfo.InvariantCulture));
+        });
+        const string fluidSource = "{{ Symbol }}|{{ Quantity }}|{{ UnitPrice | format: 'F2' }}|{% if IsBuy %}B{% else %}S{% endif %}|{{ Notional | format: 'F2' }}";
+        if (!fluidParser.TryParse(fluidSource, out _fluidTemplate, out var fluidError))
+            throw new InvalidOperationException($"Fluid benchmark template failed to parse: {fluidError}");
+
+        _smartFormatter = Smart.Default;
+        _smartParsedTemplate = _smartFormatter.Parser.ParseFormat(
+            "{Symbol}|{Quantity}|{UnitPrice:F2}|{Side}|{Notional:F2}");
+
         var expected = RenderExpected(_sample);
         AssertEqual("ColumnWeaver", expected, _columnWeaver.Parse(_sample));
         AssertEqual("StringTokenFormatter", expected, _renderTokenTemplate(_sample));
         AssertEqual("TinyString", expected, RenderTinyString(_sample));
+        AssertEqual("Scriban", expected, RenderScriban(_sample));
+        AssertEqual("Handlebars.Net", expected, _renderHandlebarsTemplate(_sample));
+        AssertEqual("Fluid", expected, RenderFluid(_sample));
+        AssertEqual("SmartFormat", expected, RenderSmartFormat(_sample));
 
         var expectedBatchLength = _batch10K.Sum(row => RenderExpected(row).Length);
         AssertEqual("ColumnWeaver batch", expectedBatchLength, RenderColumnWeaverBatch());
         AssertEqual("StringTokenFormatter batch", expectedBatchLength, RenderTokenBatch());
         AssertEqual("TinyString batch", expectedBatchLength, RenderTinyBatch());
+        AssertEqual("Scriban batch", expectedBatchLength, RenderScribanBatch());
+        AssertEqual("Handlebars.Net batch", expectedBatchLength, RenderHandlebarsBatch());
+        AssertEqual("Fluid batch", expectedBatchLength, RenderFluidBatch());
+        AssertEqual("SmartFormat batch", expectedBatchLength, RenderSmartFormatBatch());
     }
 
     [Benchmark(Baseline = true, Description = "ColumnWeaver precompiled schema")]
@@ -111,6 +172,22 @@ public class FormattingBenchmarks
     [BenchmarkCategory("Single row")]
     public string TinyString_Single() => RenderTinyString(_sample);
 
+    [Benchmark(Description = "Scriban parsed template")]
+    [BenchmarkCategory("Single row")]
+    public string Scriban_Single() => RenderScriban(_sample);
+
+    [Benchmark(Description = "Handlebars.Net compiled template")]
+    [BenchmarkCategory("Single row")]
+    public string Handlebars_Single() => _renderHandlebarsTemplate(_sample);
+
+    [Benchmark(Description = "Fluid parsed template")]
+    [BenchmarkCategory("Single row")]
+    public string Fluid_Single() => RenderFluid(_sample);
+
+    [Benchmark(Description = "SmartFormat parsed template")]
+    [BenchmarkCategory("Single row")]
+    public string SmartFormat_Single() => RenderSmartFormat(_sample);
+
     [Benchmark(Baseline = true, Description = "ColumnWeaver ParseMany 10k")]
     [BenchmarkCategory("Batch 10k")]
     public int ColumnWeaver_Batch10K() => RenderColumnWeaverBatch();
@@ -122,6 +199,22 @@ public class FormattingBenchmarks
     [Benchmark(Description = "TinyString loop 10k")]
     [BenchmarkCategory("Batch 10k")]
     public int TinyString_Batch10K() => RenderTinyBatch();
+
+    [Benchmark(Description = "Scriban template loop 10k")]
+    [BenchmarkCategory("Batch 10k")]
+    public int Scriban_Batch10K() => RenderScribanBatch();
+
+    [Benchmark(Description = "Handlebars.Net template loop 10k")]
+    [BenchmarkCategory("Batch 10k")]
+    public int Handlebars_Batch10K() => RenderHandlebarsBatch();
+
+    [Benchmark(Description = "Fluid template loop 10k")]
+    [BenchmarkCategory("Batch 10k")]
+    public int Fluid_Batch10K() => RenderFluidBatch();
+
+    [Benchmark(Description = "SmartFormat template loop 10k")]
+    [BenchmarkCategory("Batch 10k")]
+    public int SmartFormat_Batch10K() => RenderSmartFormatBatch();
 
     private static string RenderTinyString(TradeRecord row) => row.Stringify(options => options
         .NoLabel()
@@ -157,11 +250,56 @@ public class FormattingBenchmarks
         return length;
     }
 
+    private string RenderFluid(TradeRecord row) => _fluidTemplate.Render(new Fluid.TemplateContext(row, _fluidOptions));
+
+    private string RenderSmartFormat(TradeRecord row) =>
+        _smartFormatter.Format(CultureInfo.InvariantCulture, _smartParsedTemplate, new object[] { row });
+
+    private string RenderScriban(TradeRecord row)
+    {
+        _scribanGlobals.SetValue("trade", row, readOnly: false);
+        return _scribanTemplate.Render(_scribanContext);
+    }
+
+    private int RenderScribanBatch()
+    {
+        var length = 0;
+        foreach (var row in _batch10K)
+            length += RenderScriban(row).Length;
+        return length;
+    }
+
+    private int RenderHandlebarsBatch()
+    {
+        var length = 0;
+        foreach (var row in _batch10K)
+            length += _renderHandlebarsTemplate(row).Length;
+        return length;
+    }
+
+    private int RenderFluidBatch()
+    {
+        var length = 0;
+        foreach (var row in _batch10K)
+            length += RenderFluid(row).Length;
+        return length;
+    }
+
+    private int RenderSmartFormatBatch()
+    {
+        var length = 0;
+        foreach (var row in _batch10K)
+            length += RenderSmartFormat(row).Length;
+        return length;
+    }
+
     private static TradeRecord CreateRecord(int index) => new()
     {
         Symbol = "SYM" + (index % 100).ToString("D2", CultureInfo.InvariantCulture),
-        Quantity = 1 + (index % 1_000),
-        UnitPrice = 10.125 + (index % 250) * 0.37,
+        // Keep prices at two-decimal precision and quantities even so midpoint
+        // rounding differences between template engines do not contaminate the comparison.
+        Quantity = 2 * (1 + (index % 500)),
+        UnitPrice = 10.13 + (index % 250) * 0.37,
         IsBuy = index % 2 == 0
     };
 
@@ -185,6 +323,11 @@ public class FormattingBenchmarks
     }
 }
 
+public static class ScribanFormattingFunctions
+{
+    public static string Format(double value, string format) => value.ToString(format, CultureInfo.InvariantCulture);
+}
+
 internal static class Program
 {
     private static void Main(string[] args)
@@ -192,7 +335,7 @@ internal static class Program
         if (args.Contains("--verify", StringComparer.OrdinalIgnoreCase))
         {
             new FormattingBenchmarks().Setup();
-            Console.WriteLine("All three libraries produced identical single-row and 10,000-row outputs.");
+            Console.WriteLine("All seven implementations produced identical single-row and 10,000-row outputs.");
             return;
         }
 

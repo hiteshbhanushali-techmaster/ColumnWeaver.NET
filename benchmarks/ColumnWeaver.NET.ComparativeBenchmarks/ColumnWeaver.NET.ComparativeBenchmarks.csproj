@@ -16,5 +16,9 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
     <PackageReference Include="StringTokenFormatter" Version="9.0.1" />
     <PackageReference Include="TinyString" Version="1.1.0" />
+    <PackageReference Include="Scriban" Version="7.5.3" />
+    <PackageReference Include="Handlebars.Net" Version="2.4.3" />
+    <PackageReference Include="Fluid.Core" Version="2.40.0" />
+    <PackageReference Include="SmartFormat" Version="3.6.1" />
   </ItemGroup>
 </Project>
